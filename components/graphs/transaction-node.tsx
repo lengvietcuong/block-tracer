@@ -18,7 +18,7 @@ export default function TransactionNode({ data }: NodeProps) {
       <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-sm">
         {abbreviateAddress(data.label, 8)}
       </div>
-      <Link href={`/wallet/${data.label}`}>
+      <Link href={`?address=${data.label}`}>
         <div
           className={`size-full rounded-full ${
             data.selected

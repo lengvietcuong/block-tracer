@@ -13,7 +13,7 @@ export default function WalletSearch({ className }: { className?: string }) {
   const handleWalletSearch = (event: FormEvent | MouseEvent) => {
     event.preventDefault();
     if (walletAddress.trim()) {
-      router.push(`/wallet/${walletAddress}`);
+      router.push(`/wallet?address=${walletAddress}`);
     }
   };
 
