@@ -39,6 +39,7 @@ export default function WalletDetails({
             {numPages > 1 && (
               <Pages
                 className="mt-2"
+                address={address}
                 numPages={numPages}
                 currentPage={currentPage}
               />
@@ -68,6 +69,7 @@ export default function WalletDetails({
       {numPages > 1 && (
         <Pages
           className="mt-6"
+          address={address}
           numPages={numPages}
           currentPage={currentPage}
         />

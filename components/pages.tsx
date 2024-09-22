@@ -10,11 +10,12 @@ import {
 
 interface PagesProps {
   className?: string;
+  address: string;
   numPages: number;
   currentPage: number;
 }
 
-export default function Pages({ className, numPages, currentPage }: PagesProps) {
+export default function Pages({ className, address, numPages, currentPage }: PagesProps) {
   const maxPages = 3;
   const previous = Math.max(1, currentPage - 1);
   const next = Math.min(numPages, currentPage + 1);
@@ -23,7 +24,7 @@ export default function Pages({ className, numPages, currentPage }: PagesProps) 
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
-            href={`?page=${previous}`}
+            href={`?address=${address}&page=${previous}`}
             className={
               currentPage === 1
                 ? "pointer-events-none opacity-50"
@@ -38,7 +39,7 @@ export default function Pages({ className, numPages, currentPage }: PagesProps) 
           (_, i) => (
             <PaginationItem key={i}>
               <PaginationLink
-                href={`?page=${i + 1}`}
+                href={`?address=${address}&page=${i + 1}`}
                 isActive={currentPage === i + 1}
                 className="cursor-pointer"
               >
@@ -54,7 +55,7 @@ export default function Pages({ className, numPages, currentPage }: PagesProps) 
         )}
         <PaginationItem>
           <PaginationNext
-            href={`?page=${next}`}
+            href={`?address=${address}&page=${next}`}
             className={
               currentPage === numPages
                 ? "pointer-events-none opacity-50"

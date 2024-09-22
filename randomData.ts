@@ -1,25 +1,34 @@
-import crypto from "crypto";
 import Rand from "rand-seed";
 
-function generateRandomAddress() {
-  return "0x" + crypto.randomBytes(20).toString("hex");
+function generateRandomAddress(rand: Rand) {
+  let address = "0x";
+  for (let i = 0; i < 20; i++) {
+    address += Math.floor(rand.next() * 256).toString(16).padStart(2, '0');
+  }
+  return address;
 }
 
-function generateRandomTransactionID() {
-  return crypto.randomBytes(32).toString("hex");
+function generateRandomTransactionID(rand: Rand) {
+  let id = "";
+  for (let i = 0; i < 32; i++) {
+    id += Math.floor(rand.next() * 256).toString(16).padStart(2, '0');
+  }
+  return id;
 }
 
 export function getTransactions(address: string, start: number, end: number) {
+  const rand = new Rand(`${address}${start}${end}`);
+
   const transactions = [];
   const count = end - start + 1;
 
   for (let i = 0; i < count; i++) {
-    const isSender = Math.random() > 0.5;
-    const randomAddress = generateRandomAddress();
-    const amount = (Math.random() * 1).toFixed(2);
+    const isSender = rand.next() > 0.5;
+    const randomAddress = generateRandomAddress(rand);
+    const amount = (rand.next() * 1).toFixed(2);
 
     transactions.push({
-      id: generateRandomTransactionID(),
+      id: generateRandomTransactionID(rand),
       sender: isSender ? address : randomAddress,
       receiver: isSender ? randomAddress : address,
       amount: parseFloat(amount),
