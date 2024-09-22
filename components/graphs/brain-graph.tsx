@@ -36,7 +36,7 @@ function createEdge(source: number, target: number) {
 
 function BrainNode({ data }: NodeProps) {
   return (
-    <div className="relative size-7" title={data.label}>
+    <div className="relative size-8 lg:size-6" title={data.label}>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <Handle type="source" position={Position.Left} className="invisible" />
       </div>
@@ -46,7 +46,7 @@ function BrainNode({ data }: NodeProps) {
         } bg-background`}
       >
         <UserIcon
-          className={`size-3 ${
+          className={`size-3 lg:size-2.5 ${
             data.selected ? "fill-destructive" : "fill-primary"
           }`}
         />

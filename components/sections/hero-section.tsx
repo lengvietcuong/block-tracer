@@ -3,8 +3,8 @@ import BrainGraph from "@/components/graphs/brain-graph";
 
 export default function HeroSection() {
   return (
-    <section className="spacing-section lg:gap-16 gap-12 flex lg:flex-row flex-col lg:items-center">
-      <div className="w-full lg:w-1/2">
+    <section className="spacing-section lg:gap-24 gap-12 flex lg:flex-row flex-col lg:items-center">
+      <div className="w-full lg:w-2/5">
         <h1 className="font-bold text-3xl md:text-5xl xl:text-6xl">
           Effortlessly uncover every transaction.
         </h1>
@@ -15,7 +15,7 @@ export default function HeroSection() {
         </p>
         <WalletSearch className="w-full h-10 md:w-[440px] lg:h-12 bg-background text-sm shadow-[0_0_10px_3px_hsl(var(--muted-foreground)/0.5)] lg:shadow-[0_0_20px_5px_hsl(var(--muted-foreground)/0.5)]" />
       </div>
-      <BrainGraph className="w-[360px] h-[300px] max-w-full md:w-[480px] md:h-[400px] lg:w-[600px] lg:h-[500px] mx-auto" />
+      <BrainGraph className="w-[360px] h-[300px] max-w-full md:w-[480px] md:h-[400px] lg:w-[720px] lg:h-[600px] mx-auto" />
     </section>
   );
 }
