@@ -5,17 +5,34 @@ import { Input } from "@/components/ui/input";
 import { IoSearch as SearchIcon } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import api from "./api";
 
 export default function WalletSearch({ className }: { className?: string }) {
   const [walletAddress, setWalletAddress] = useState("");
   const router = useRouter();
 
-  const handleWalletSearch = (event: FormEvent | MouseEvent) => {
-    event.preventDefault();
+  const handleWalletSearch = async (event: FormEvent | MouseEvent) => {
+    event.preventDefault(); // Prevent page reload
+  
     if (walletAddress.trim()) {
-      router.push(`/wallet?address=${walletAddress}`);
+      console.log("walletAddress", walletAddress);
+      
+      try {
+        const response = await api.post(`/search_wallet/${walletAddress}`); // Use template string correctly
+  
+        if (response.status === 200) {
+          if (response.data['Error']) {
+            alert(response.data['Error']);
+          } else {
+            router.push(`/wallet?address=${walletAddress}`);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        alert("An error occurred while searching for the wallet.");
+      }
     }
-  };
+  };  
 
   return (
     <form className="relative" onSubmit={handleWalletSearch}>

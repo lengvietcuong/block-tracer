@@ -35,14 +35,13 @@ export default function API_call() {
       
   return(
     <div>
-        <h1>cứu</h1>
-          <div className="w-fit mx-auto">
-            <TransactionGraph
-              className="size-[360px] md:size-[440px] lg:size-[500px]"
-              address={address}
-              transactions={transaction}
-            />
-          </div>
+        <div className="w-fit mx-auto">
+          <TransactionGraph
+            className="size-[360px] md:size-[440px] lg:size-[500px]"
+            address={address}
+            transactions={transaction}
+          />
+        </div>
         <TransactionHistory transactions={transaction} />
     </div>
   );
