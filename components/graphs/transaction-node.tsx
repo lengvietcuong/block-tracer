@@ -11,7 +11,7 @@ function abbreviateAddress(address: string, maxLength: number) {
 
 export default function TransactionNode({ data }: NodeProps) {
   return (
-    <div className="relative size-12" title={data.label}>
+    <div className="relative size-12 !pointer-events-auto" title={data.label}>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <Handle type="source" position={Position.Left} className="invisible" />
       </div>

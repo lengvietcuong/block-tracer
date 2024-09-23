@@ -74,10 +74,9 @@ export default function TransactionGraph({
   function setNodePositions(nodes: Node[]) {
     // Set node positions in a circular layout
     const radius = GRAPH_SIZE_LENGTH / 2;
-    const offset = 0.2; // Add a slight rotation to prevent straight lines that have small hitboxes
     nodes.forEach((node, index) => {
       if (node.id === address) return; // Position already set at the center
-      const angle = (index / (nodes.length - 1)) * 2 * Math.PI + offset;
+      const angle = (index / (nodes.length - 1)) * 2 * Math.PI;
       node.position = {
         x: radius * Math.cos(angle),
         y: radius * Math.sin(angle),
@@ -125,6 +124,11 @@ export default function TransactionGraph({
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView
+        edgesUpdatable={false}
+        edgesFocusable={false}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        nodesFocusable={false}
         draggable={false}
         panOnDrag={false}
         elementsSelectable={false}
