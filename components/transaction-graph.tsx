@@ -48,7 +48,7 @@ export default function TransactionGraph({
     const isSearchedWalletSender = transaction.sender === address;
     const start = isSearchedWalletSender ? { x: CENTER, y: CENTER } : node;
     const end = isSearchedWalletSender ? node : { x: CENTER, y: CENTER };
-
+  
     const dx = end.x - start.x;
     const dy = end.y - start.y;
     const length = Math.sqrt(dx * dx + dy * dy);
@@ -56,26 +56,37 @@ export default function TransactionGraph({
     const startY = start.y + (dy * NODE_RADIUS) / length;
     const endX = end.x - (dx * NODE_RADIUS) / length;
     const endY = end.y - (dy * NODE_RADIUS) / length;
-
+  
     const arrowDx = dx / length;
     const arrowDy = dy / length;
     const arrowPoint1X = endX - ARROW_LENGTH * arrowDx + ARROW_WIDTH * arrowDy;
     const arrowPoint1Y = endY - ARROW_LENGTH * arrowDy - ARROW_WIDTH * arrowDx;
     const arrowPoint2X = endX - ARROW_LENGTH * arrowDx - ARROW_WIDTH * arrowDy;
     const arrowPoint2Y = endY - ARROW_LENGTH * arrowDy + ARROW_WIDTH * arrowDx;
-
+  
     const edgeId = `edge-${transaction.id}`;
     const isHovered = hoveredEdge === edgeId;
-
+  
     const sign = isSearchedWalletSender ? "-" : "+";
     const amount = `${sign}${transaction.amount.toFixed(2)} ETH`;
-
+  
     return (
       <g
         key={edgeId}
         onMouseEnter={() => setHoveredEdge(edgeId)}
         onMouseLeave={() => setHoveredEdge(null)}
       >
+        {/* Invisible line to increase the edge's hitbox */}
+        <line
+          x1={startX}
+          y1={startY}
+          x2={endX}
+          y2={endY}
+          stroke="transparent"
+          strokeWidth={20}
+        />
+  
+        {/* Visible line */}
         <line
           x1={startX}
           y1={startY}
@@ -85,12 +96,12 @@ export default function TransactionGraph({
             isHovered ? "stroke-primary stroke-2" : "stroke-muted-foreground/35"
           }
         />
-
+  
         <polygon
           points={`${endX},${endY} ${arrowPoint1X},${arrowPoint1Y} ${arrowPoint2X},${arrowPoint2Y}`}
           className={isHovered ? "fill-primary" : "fill-neutral-500"}
         />
-
+  
         <g
           transform={`translate(${(startX + endX) / 2},
             ${(startY + endY) / 2})`}
@@ -117,7 +128,7 @@ export default function TransactionGraph({
         </g>
       </g>
     );
-  }
+  }  
 
   function renderNode(node: Node) {
     return (
