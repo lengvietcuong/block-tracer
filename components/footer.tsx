@@ -1,4 +1,4 @@
-import Logo from "@/components/logo";
+import Logo from "@/components/icons/logo";
 import { TbMail as EmailIcon } from "react-icons/tb";
 import { PiPhoneBold as PhoneIcon } from "react-icons/pi";
 import { PiMapPin as LocationIcon } from "react-icons/pi";

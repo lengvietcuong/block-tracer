@@ -42,7 +42,6 @@ export function getWalletOverview(address: string) {
   const rand = new Rand(address);
 
   return {
-    blockchain: "Ethereum",
     balance: parseFloat((rand.next() * 2).toFixed(2)),
     sent: Math.floor(rand.next() * 20),
     received: Math.floor(rand.next() * 20),

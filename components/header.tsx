@@ -1,5 +1,5 @@
 import HeaderWrapper from "./header-wrapper";
-import Logo from "@/components/logo";
+import Logo from "@/components/icons/logo";
 import Link from "next/link";
 
 export default function Header({

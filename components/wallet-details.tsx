@@ -5,6 +5,7 @@ import Pages from "@/components/pages";
 import { getWalletOverview, getTransactions } from "@/randomData";
 
 interface WalletDetailsProps {
+  blockchainSymbol: string;
   address: string;
   currentPage: number;
 }
@@ -12,11 +13,12 @@ interface WalletDetailsProps {
 const TRANSACTIONS_PER_PAGE = 15;
 
 export default function WalletDetails({
+  blockchainSymbol,
   address,
   currentPage,
 }: WalletDetailsProps) {
   // Suppose this is an actual fetch call to a database
-  const { blockchain, balance, sent, received, lastActive } =
+  const { balance, sent, received, lastActive } =
     getWalletOverview(address);
   const numPages = Math.ceil((sent + received) / TRANSACTIONS_PER_PAGE);
   const start = (currentPage - 1) * TRANSACTIONS_PER_PAGE;
@@ -33,12 +35,14 @@ export default function WalletDetails({
           <div className="w-fit mx-auto">
             <TransactionGraph
               className="size-[360px] md:size-[440px] lg:size-[500px]"
+              blockchainSymbol={blockchainSymbol}
               address={address}
               transactions={transactions}
             />
             {numPages > 1 && (
               <Pages
                 className="mt-2"
+                blockchainSymbol={blockchainSymbol}
                 address={address}
                 numPages={numPages}
                 currentPage={currentPage}
@@ -54,7 +58,7 @@ export default function WalletDetails({
           <WalletOverview
             className="w-fit"
             address={address}
-            blockchain={blockchain}
+            blockchainSymbol={blockchainSymbol}
             balance={balance}
             sent={sent}
             received={received}
@@ -69,6 +73,7 @@ export default function WalletDetails({
       {numPages > 1 && (
         <Pages
           className="mt-6"
+          blockchainSymbol={blockchainSymbol}
           address={address}
           numPages={numPages}
           currentPage={currentPage}

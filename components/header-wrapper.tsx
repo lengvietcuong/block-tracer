@@ -35,7 +35,7 @@ function HeaderWrapper({
     >
       <div className="flex items-center max-w-screen-2xl mx-auto justify-between">
         {children}
-        {(scrolled || !changeStyleOnScroll) && <WalletSearch />}
+        {(scrolled || !changeStyleOnScroll) && <WalletSearch variant="compact"/>}
       </div>
     </header>
   );

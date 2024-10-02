@@ -1,3 +1,4 @@
+import { BLOCKCHAIN_NAMES } from "@/constants";
 import { PiWalletBold as WalletIcon } from "react-icons/pi";
 import { PiCoinsBold as CoinsIcon } from "react-icons/pi";
 import { PiClockClockwiseBold as ClockIcon } from "react-icons/pi";
@@ -7,8 +8,8 @@ import { cn } from "@/lib/utils";
 
 interface WalletOverviewProps {
   className?: string;
+  blockchainSymbol: string;
   address: string;
-  blockchain: string;
   balance: number;
   sent: number;
   received: number;
@@ -17,8 +18,8 @@ interface WalletOverviewProps {
 
 export default function WalletOverview({
   className,
+  blockchainSymbol,
   address,
-  blockchain,
   balance,
   sent,
   received,
@@ -31,21 +32,25 @@ export default function WalletOverview({
           <WalletIcon className="text-primary" />
           <p className="text-sm text-muted-foreground">Address</p>
         </div>
-        <p className="font-medium">{address}</p>
+        <p className="font-medium text-sm sm:text-base">{address}</p>
       </div>
       <div className="space-y-1">
         <div className="flex items-center gap-1">
           <BlockchainIcon className="text-primary" />
           <p className="text-sm text-muted-foreground">Blockchain</p>
         </div>
-        <p className="font-medium">{blockchain}</p>
+        <p className="font-medium">
+          {BLOCKCHAIN_NAMES[blockchainSymbol as keyof typeof BLOCKCHAIN_NAMES]}
+        </p>
       </div>
       <div className="space-y-1">
         <div className="flex items-center gap-1">
           <CoinsIcon className="text-primary" />
           <p className="text-sm text-muted-foreground">Balance</p>
         </div>
-        <p className="font-medium text-4xl">{balance} ETH</p>
+        <p className="font-medium text-4xl">
+          {balance} {blockchainSymbol}
+        </p>
       </div>
       <div className="space-y-2">
         <div className="flex items-center gap-1">
