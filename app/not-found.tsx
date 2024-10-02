@@ -12,7 +12,7 @@ export default function NotFound() {
           <h1 className="text-3xl font-bold">Not Found</h1>
         </div>
         <p>
-          We couldn't find the wallet address you're looking for.
+          We couldn&apos;t find the wallet address you&apos;re looking for.
           <br />
           This could be due to:
         </p>
