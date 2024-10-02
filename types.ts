@@ -4,3 +4,10 @@ export type Transaction = {
   receiver: string;
   amount: number;
 };
+
+export type Node = {
+  id: string;
+  address: string;
+  x: number;
+  y: number;
+};

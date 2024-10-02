@@ -1,5 +1,5 @@
 import WalletSearch from "@/components/wallet-search";
-import BrainGraph from "@/components/graphs/brain-graph";
+import BrainGraph from "@/components/brain-graph";
 
 export default function HeroSection() {
   return (

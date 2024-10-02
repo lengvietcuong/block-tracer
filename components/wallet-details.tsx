@@ -1,5 +1,5 @@
 import WalletOverview from "@/components/wallet-overview";
-import TransactionGraph from "@/components/graphs/transaction-graph";
+import TransactionGraph from "@/components/transaction-graph";
 import TransactionHistory from "@/components/transaction-history";
 import Pages from "@/components/pages";
 import { getWalletOverview, getTransactions } from "@/randomData";
