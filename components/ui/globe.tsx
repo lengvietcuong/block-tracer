@@ -29,7 +29,7 @@ const LIGHT_MUTED_GREEN: [number, number, number] = [
 ];
 const RED: [number, number, number] = [191 / 255, 64 / 255, 64 / 255];
 
-export default function Globe({ className }: { className?: string }) {
+export default function Globe() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -44,9 +44,9 @@ export default function Globe({ className }: { className?: string }) {
     const height = parseFloat(computedStyle.height);
 
     const globe = createGlobe(canvasRef.current, {
-      devicePixelRatio: 2,
-      width: width * 2,
-      height: height * 2,
+      devicePixelRatio: 1,
+      width: width,
+      height: height,
       phi: 0,
       theta: 0,
       dark: 1,
@@ -67,7 +67,7 @@ export default function Globe({ className }: { className?: string }) {
     return () => {
       globe.destroy();
     };
-  }, [className]); // Add className as a dependency to recompute on class change
+  }, []);
 
   return <canvas ref={canvasRef} className="w-full h-full aspect-square" />;
 }
