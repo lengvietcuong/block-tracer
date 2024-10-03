@@ -1,15 +1,16 @@
-import WalletDetails from "@/components/wallet-details";
+import WalletDetails from "@/components/wallet-details/wallet-details";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { redirect } from "next/navigation";
 import { BLOCKCHAIN_NAMES } from "@/constants";
+import { BlockchainSymbol } from "@/types";
 
 export default function Home({
   searchParams,
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const blockchainSymbol = searchParams.chain as string;
+  const blockchainSymbol = searchParams.chain as BlockchainSymbol;
   if (!(blockchainSymbol in BLOCKCHAIN_NAMES)) {
     redirect("/not-found");
   }
@@ -19,7 +20,7 @@ export default function Home({
 
   return (
     <>
-      <Header changeStyleOnScroll={false}/>
+      <Header changeStyleOnScroll={false} />
       <main className="spacing-section">
         <WalletDetails
           blockchainSymbol={blockchainSymbol}

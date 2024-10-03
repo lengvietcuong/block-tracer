@@ -1,11 +1,12 @@
-import WalletOverview from "@/components/wallet-overview";
-import TransactionGraph from "@/components/transaction-graph";
-import TransactionHistory from "@/components/transaction-history";
+import WalletOverview from "@/components/wallet-details/wallet-overview";
+import TransactionGraph from "@/components/wallet-details/transaction-graph";
+import TransactionHistory from "@/components/wallet-details/transaction-history";
 import Pages from "@/components/pages";
 import { getWalletOverview, getTransactions } from "@/randomData";
+import { BlockchainSymbol } from "@/types";
 
 interface WalletDetailsProps {
-  blockchainSymbol: string;
+  blockchainSymbol: BlockchainSymbol;
   address: string;
   currentPage: number;
 }
@@ -18,8 +19,16 @@ export default function WalletDetails({
   currentPage,
 }: WalletDetailsProps) {
   // Suppose this is an actual fetch call to a database
-  const { balance, sent, received, lastActive } =
-    getWalletOverview(address);
+  const {
+    balance,
+    sent,
+    received,
+    amountSent,
+    amountReceived,
+    firstActive,
+    lastActive,
+    riskScore
+  } = getWalletOverview(address);
   const numPages = Math.ceil((sent + received) / TRANSACTIONS_PER_PAGE);
   const start = (currentPage - 1) * TRANSACTIONS_PER_PAGE;
   const end = currentPage * TRANSACTIONS_PER_PAGE - 1;
@@ -28,13 +37,13 @@ export default function WalletDetails({
   return (
     <>
       <div className="flex flex-col-reverse lg:flex-row gap-12 xl:gap-24 mb-12">
-        <div>
+        <div className="flex-1">
           <h2 className="text-2xl lg:text-3xl font-bold mb-6">
             Transaction Graph
           </h2>
           <div className="w-fit mx-auto">
             <TransactionGraph
-              className="size-[360px] md:size-[440px] lg:size-[500px]"
+              className="size-[360px] sm:size[400px] md:size-[500px] lg:size-[400px] xl:size-[500px]"
               blockchainSymbol={blockchainSymbol}
               address={address}
               transactions={transactions}
@@ -51,25 +60,31 @@ export default function WalletDetails({
           </div>
         </div>
         <div className="self-strech border-l border-muted hidden lg:block"></div>
-        <div>
+        <div className="flex-1">
           <h2 className="text-2xl lg:text-3xl font-bold mb-6">
             Wallet Overview
           </h2>
           <WalletOverview
-            className="w-fit"
             address={address}
             blockchainSymbol={blockchainSymbol}
             balance={balance}
             sent={sent}
             received={received}
+            amountSent={amountSent}
+            amountReceived={amountReceived}
+            firstActive={firstActive}
             lastActive={lastActive}
+            riskScore={riskScore}
           />
         </div>
       </div>
       <h2 className="text-2xl lg:text-3xl font-bold mb-6">
         Transaction History
       </h2>
-      <TransactionHistory transactions={transactions} />
+      <TransactionHistory
+        blockchainSymbol={blockchainSymbol}
+        transactions={transactions}
+      />
       {numPages > 1 && (
         <Pages
           className="mt-6"

@@ -11,3 +11,5 @@ export type Node = {
   x: number;
   y: number;
 };
+
+export type BlockchainSymbol = "ETH" | "BNB" | "AVAX" | "MATIC" | "KLAY" | "SWC";

@@ -7,10 +7,11 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
+import { BlockchainSymbol } from "@/types";
 
 interface PagesProps {
   className?: string;
-  blockchainSymbol: string;
+  blockchainSymbol: BlockchainSymbol;
   address: string;
   numPages: number;
   currentPage: number;

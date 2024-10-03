@@ -6,16 +6,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Transaction } from "@/types";
+import { Transaction, BlockchainSymbol } from "@/types";
 import { cn } from "@/lib/utils";
 
 interface TransactionHistoryProps {
   className?: string;
+  blockchainSymbol: BlockchainSymbol;
   transactions: Transaction[];
 }
 
 export default function TransactionHistory({
   className,
+  blockchainSymbol,
   transactions,
 }: TransactionHistoryProps) {
   return (
@@ -48,7 +50,7 @@ export default function TransactionHistory({
             </TableCell>
             <TableCell
               className="text-nowrap"
-              title={`${transaction.amount} ETH`}
+              title={`${transaction.amount} ${blockchainSymbol}`}
             >
               {transaction.amount} ETH
             </TableCell>

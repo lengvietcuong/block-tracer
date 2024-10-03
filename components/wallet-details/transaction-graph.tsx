@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
-import { Transaction, Node } from "@/types";
+import { Transaction, Node, BlockchainSymbol } from "@/types";
 
 function abbreviateAddress(address: string) {
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
@@ -10,7 +10,7 @@ function abbreviateAddress(address: string) {
 
 interface TransactionGraphProps {
   className?: string;
-  blockchainSymbol: string;
+  blockchainSymbol: BlockchainSymbol;
   address: string;
   transactions: Transaction[];
 }
