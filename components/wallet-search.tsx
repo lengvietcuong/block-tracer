@@ -52,10 +52,11 @@ export default function WalletSearch({ variant = "full" }: WalletSearchProps) {
     if (walletAddress.trim()) {
       router.push(`/wallet?chain=${blockchain}&address=${walletAddress}`);
     }
-  };
+  }
 
   return (
     <form
+      id="wallet-search"
       className={`flex items-center rounded-lg ${
         variant === "full"
           ? "shadow-[0_0_10px_3px_hsl(var(--muted-foreground)/0.5)] lg:shadow-[0_0_20px_5px_hsl(var(--muted-foreground)/0.5)]"
@@ -65,13 +66,15 @@ export default function WalletSearch({ variant = "full" }: WalletSearchProps) {
     >
       <div className="relative flex-1">
         <button
-          className="absolute left-4 top-1/2 -translate-y-1/2"
+          aria-label="Search wallet"
+          className="absolute left-3 top-1/2 -translate-y-1/2 p-1"
           onClick={handleWalletSearch}
         >
           <SearchIcon className="size-5 fill-primary hover:fill-primary/90" />
         </button>
         <Input
           type="text"
+          id="address"
           value={walletAddress}
           onChange={(e) => setWalletAddress(e.target.value)}
           placeholder="Enter address"
@@ -81,7 +84,11 @@ export default function WalletSearch({ variant = "full" }: WalletSearchProps) {
         />
       </div>
       <Select value={blockchain} onValueChange={setBlockchain}>
-        <SelectTrigger className="w-24 flex-shrink-0 border-none bg-transparent">
+        <SelectTrigger
+          id="blockchain"
+          aria-label="Select blockchain"
+          className="w-24 flex-shrink-0 border-none bg-transparent"
+        >
           <SelectValue placeholder="Blockchain" />
         </SelectTrigger>
         <SelectContent side="bottom">

@@ -9,7 +9,7 @@ export default function Header({
 }) {
   return (
     <HeaderWrapper changeStyleOnScroll={changeStyleOnScroll}>
-      <Link href="/">
+      <Link href="/" aria-label="Back to Home">
         <div className="flex items-center gap-4">
           <Logo className="size-8 lg:size-10 fill-primary" />
           <p className="font-bold hidden md:block text-xl">Block Tracer</p>
