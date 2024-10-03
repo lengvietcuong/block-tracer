@@ -51,7 +51,7 @@ function ContactItem({ Icon, text, href }: ContactItemProps) {
 
 export default function Footer() {
   return (
-    <footer className="border-t bg-background px-6 py-8 md:px-8 lg:px-12 xl:px-36">
+    <footer className="border-t bg-background px-6 py-8 md:px-8 lg:px-12 xl:px-28">
       <div className="mx-auto max-w-screen-2xl">
         <div className="flex flex-col gap-6 md:flex-row md:justify-between">
           <div className="flex flex-col lg:flex-row justify-center gap-6 lg:gap-8">

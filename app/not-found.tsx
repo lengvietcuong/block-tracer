@@ -21,7 +21,7 @@ export default function NotFound() {
           <li>Searching on the wrong blockchain</li>
         </ul>
         <Link href="/">
-          <Button className="mt-12 font-bold mx-auto">
+          <Button className="mt-12 mx-auto">
             <ArrowLeftIcon className="size-4 mr-2" />
             Back to Home
           </Button>

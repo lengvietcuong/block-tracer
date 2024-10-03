@@ -27,7 +27,7 @@ function HeaderWrapper({
 
   return (
     <header
-      className={`sticky top-0 z-10 px-4 md:px-8 lg:px-12 xl:px-36 py-3 transition-colors duration-300 ${
+      className={`sticky top-0 z-10 px-4 md:px-8 lg:px-12 xl:px-28 py-3 transition-colors duration-300 ${
         scrolled || !changeStyleOnScroll
           ? "bg-background border-b"
           : "bg-transparent"

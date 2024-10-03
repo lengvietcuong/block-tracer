@@ -12,7 +12,7 @@ export default function Header({
       <Link href="/" aria-label="Back to Home">
         <div className="flex items-center gap-4">
           <Logo className="size-8 lg:size-10 fill-primary" />
-          <p className="font-bold hidden md:block text-xl">Block Tracer</p>
+          <p className="font-bold hidden sm:block text-xl">Block Tracer</p>
         </div>
       </Link>
     </HeaderWrapper>

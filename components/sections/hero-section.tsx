@@ -15,7 +15,7 @@ export default function HeroSection() {
         </p>
         <WalletSearch variant="full" />
       </div>
-      <BrainGraph className="aspect-[7/6] lg:ml-auto mx-auto w-[350px] md:w-[490px] max-w-full lg:w-[700px]" />
+      <BrainGraph className="aspect-[7/6] lg:ml-auto mx-auto w-[350px] md:w-[490px] max-w-full lg:w-[630px]" />
     </section>
   );
 }
