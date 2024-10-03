@@ -77,7 +77,7 @@ export default function WalletOverview({
   const verdict = getVerdict(riskScore);
 
   return (
-    <div className={cn("space-y-6 lg:space-y-8", className)}>
+    <div className={cn("space-y-8", className)}>
       <div>
         <div className="flex items-center mb-1.5">
           <WalletIcon className="text-primary mr-1.5" />
