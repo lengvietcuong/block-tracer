@@ -5,7 +5,10 @@ import Link from "next/link";
 import { Transaction, Node, BlockchainSymbol } from "@/types";
 
 function abbreviateAddress(address: string) {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  if (address.length <= 8) {
+    return address;
+  }
+  return `${address.slice(0, 4)}...${address.slice(-4)}`;
 }
 
 interface TransactionGraphProps {
