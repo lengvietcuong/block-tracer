@@ -50,7 +50,7 @@ function getRandomDate(startDate: Date, endDate: Date, rand: Rand) {
 }
 
 function getRiskScore(rand: Rand) {
-  return Math.random() < 2 / 3
+  return rand.next() < 2 / 3
     ? Math.floor(rand.next() * 26)
     : 26 + Math.floor(rand.next() * 75);
 }

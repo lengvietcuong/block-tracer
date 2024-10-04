@@ -52,7 +52,7 @@ export default function TransactionHistory({
               className="text-nowrap"
               title={`${transaction.amount} ${blockchainSymbol}`}
             >
-              {transaction.amount} ETH
+              {transaction.amount} {blockchainSymbol}
             </TableCell>
           </TableRow>
         ))}
