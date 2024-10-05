@@ -11,6 +11,7 @@ export type Node = {
   address: string;
   x: number;
   y: number;
+  radius: number;
 };
 
 export type BlockchainSymbol = "eth" | "bnb" | "avax" | "matic" | "klay" | "swc";

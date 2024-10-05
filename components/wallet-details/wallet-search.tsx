@@ -9,7 +9,6 @@ import { IoSearch as SearchIcon } from "react-icons/io5";
 
 interface WalletSearchProps {
   variant?: "full" | "compact";
-  showLoading?: boolean;
 }
 
 export default function WalletSearch({ variant = "full" }: WalletSearchProps) {

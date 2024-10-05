@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import Link from "next/link";
 import { Transaction, Node, BlockchainSymbol } from "@/types";
 
@@ -21,7 +21,8 @@ interface TransactionGraphProps {
 const SIDE_LENGTH = 600;
 const CENTER = SIDE_LENGTH / 2;
 const RADIUS = SIDE_LENGTH / 2.5;
-const NODE_RADIUS = 24;
+const MIN_NODE_RADIUS = 16;
+const MAX_NODE_RADIUS = 40;
 const ARROW_LENGTH = 12;
 const ARROW_WIDTH = 6;
 
@@ -35,19 +36,30 @@ export default function TransactionGraph({
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Create nodes for wallets that have interacted with the searched wallet
-  const nodes: Node[] = transactions.map((transaction, index) => {
-    const angle = (index / transactions.length) * 2 * Math.PI;
-    return {
-      id: transaction.id,
-      address:
-        transaction.sender === address
-          ? transaction.receiver
-          : transaction.sender,
-      x: CENTER + RADIUS * Math.cos(angle),
-      y: CENTER + RADIUS * Math.sin(angle),
-    };
-  });
+  const { nodes } = useMemo(() => {
+    const amounts = transactions.map(t => t.amount);
+    const minAmount = Math.min(...amounts);
+    const maxAmount = Math.max(...amounts);
+
+    const nodes: Node[] = transactions.map((transaction, index) => {
+      const angle = (index / transactions.length) * 2 * Math.PI;
+      const normalizedAmount = (transaction.amount - minAmount) / (maxAmount - minAmount);
+      const nodeRadius = MIN_NODE_RADIUS + normalizedAmount * (MAX_NODE_RADIUS - MIN_NODE_RADIUS);
+
+      return {
+        id: transaction.id,
+        address:
+          transaction.sender === address
+            ? transaction.receiver
+            : transaction.sender,
+        x: CENTER + RADIUS * Math.cos(angle),
+        y: CENTER + RADIUS * Math.sin(angle),
+        radius: nodeRadius,
+      };
+    });
+
+    return { nodes, minAmount, maxAmount };
+  }, [transactions, address]);
 
   function renderEdge(transaction: Transaction, node: Node) {
     const isSearchedWalletSender = transaction.sender === address;
@@ -57,10 +69,10 @@ export default function TransactionGraph({
     const dx = end.x - start.x;
     const dy = end.y - start.y;
     const length = Math.sqrt(dx * dx + dy * dy);
-    const startX = start.x + (dx * NODE_RADIUS) / length;
-    const startY = start.y + (dy * NODE_RADIUS) / length;
-    const endX = end.x - (dx * NODE_RADIUS) / length;
-    const endY = end.y - (dy * NODE_RADIUS) / length;
+    const startX = start.x + (dx * (isSearchedWalletSender ? MAX_NODE_RADIUS : node.radius)) / length;
+    const startY = start.y + (dy * (isSearchedWalletSender ? MAX_NODE_RADIUS : node.radius)) / length;
+    const endX = end.x - (dx * (isSearchedWalletSender ? node.radius : MAX_NODE_RADIUS)) / length;
+    const endY = end.y - (dy * (isSearchedWalletSender ? node.radius : MAX_NODE_RADIUS)) / length;
 
     const arrowDx = dx / length;
     const arrowDy = dy / length;
@@ -152,7 +164,7 @@ export default function TransactionGraph({
           <circle
             cx={node.x}
             cy={node.y}
-            r={NODE_RADIUS}
+            r={node.radius}
             className={
               hoveredNode === node.id
                 ? "stroke-primary stroke-2 fill-primary/15"
@@ -161,7 +173,7 @@ export default function TransactionGraph({
           />
           <text
             x={node.x}
-            y={node.y - 32}
+            y={node.y - node.radius - 8}
             textAnchor="middle"
             className="text-xs fill-foreground"
           >
@@ -198,12 +210,12 @@ export default function TransactionGraph({
           <circle
             cx={CENTER}
             cy={CENTER}
-            r={NODE_RADIUS}
+            r={MAX_NODE_RADIUS}
             className="fill-primary"
           />
           <text
             x={CENTER}
-            y={CENTER - 32}
+            y={CENTER - MAX_NODE_RADIUS - 8}
             textAnchor="middle"
             className="text-xs fill-foreground"
           >
