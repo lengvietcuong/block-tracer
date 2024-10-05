@@ -7,7 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { PiCopySimpleBold as CopyIcon } from "react-icons/pi";
 import { PiCheckCircleBold as CheckmarkIcon } from "react-icons/pi";
 

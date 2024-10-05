@@ -7,48 +7,48 @@ import {
 } from "@/components/ui/select";
 import { BlockchainSymbol } from "@/types";
 import { BLOCKCHAIN_NAMES } from "@/constants";
-import Etherium from "./icons/etherium";
-import Binance from "./icons/binance";
-import Avalanche from "./icons/avalanche";
-import Polygon from "./icons/polygon";
-import Klaytn from "./icons/klaytn";
-import Swincoin from "./icons/swincoin";
+import Etherium from "../icons/etherium";
+import Binance from "../icons/binance";
+import Avalanche from "../icons/avalanche";
+import Polygon from "../icons/polygon";
+import Klaytn from "../icons/klaytn";
+import Swincoin from "../icons/swincoin";
 
 const BLOCKCHAIN_ICONS = {
-  ETH: Etherium,
-  BNB: Binance,
-  AVAX: Avalanche,
-  MATIC: Polygon,
-  KLAY: Klaytn,
-  SWC: Swincoin,
+  eth: Etherium,
+  bnb: Binance,
+  avax: Avalanche,
+  matic: Polygon,
+  klay: Klaytn,
+  swc: Swincoin,
 };
 
 interface BlockchainSelectionProps {
   className?: string;
-  blockchain: BlockchainSymbol;
-  setBlockchain: (blockchain: BlockchainSymbol) => void;
+  blockchainSymbol: BlockchainSymbol;
+  setBlockchainSymbol: (blockchainSymbol: BlockchainSymbol) => void;
 }
 
 export default function BlockchainSelection({
   className,
-  blockchain,
-  setBlockchain,
+  blockchainSymbol,
+  setBlockchainSymbol,
 }: BlockchainSelectionProps) {
   function renderBlockchain(symbol: BlockchainSymbol) {
     const Icon = BLOCKCHAIN_ICONS[symbol];
     return (
       <div className="flex items-center gap-2">
         <Icon className="size-4" />
-        {symbol}
+        {symbol.toUpperCase()}
       </div>
     );
   }
 
   return (
-    <Select value={blockchain} onValueChange={setBlockchain}>
+    <Select value={blockchainSymbol} onValueChange={setBlockchainSymbol}>
       <SelectTrigger
-        id="blockchain"
-        aria-label="Select blockchain"
+        id="blockchainSymbol"
+        aria-label="Select blockchainSymbol"
         className={className}
       >
         <SelectValue placeholder="Blockchain" />

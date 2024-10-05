@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import CopyButton from "../copy-button";
+import CopyButton from "@/components/wallet-details/copy-button";
 import { BlockchainSymbol } from "@/types";
 import { PiWalletBold as WalletIcon } from "react-icons/pi";
 import { PiCoinsBold as CoinsIcon } from "react-icons/pi";
@@ -10,13 +10,14 @@ import { FiMinusCircle as MinusIcon } from "react-icons/fi";
 import { GrDocumentText as TransactionIcon } from "react-icons/gr";
 import { HiOutlineInformationCircle as InfoIcon } from "react-icons/hi";
 import { BLOCKCHAIN_NAMES } from "@/constants";
-import { convertToUsd, formatDate, getTimeAgo } from "@/utils";
+import { convertToUsd, getTimeAgo } from "@/utils";
+import { format } from "date-fns"
 import { cn } from "@/lib/utils";
 
 interface WalletOverviewProps {
   className?: string;
-  address: string;
   blockchainSymbol: BlockchainSymbol;
+  address: string;
   balance: number;
   sent: number;
   received: number;
@@ -31,16 +32,13 @@ function getVerdict(riskScore: number) {
   let title, description;
   if (riskScore <= 25) {
     title = "Safe";
-    description =
-      "No suspicious activity detected.";
+    description = "No suspicious activity detected.";
   } else if (riskScore <= 50) {
     title = "Uncertain";
-    description =
-      "This wallet is somewhat suspicious.";
+    description = "This wallet is somewhat suspicious.";
   } else {
     title = "Danger";
-    description =
-      "Suspicious activities detected.";
+    description = "Suspicious activities detected.";
   }
 
   return { title, description };
@@ -54,8 +52,8 @@ const RISK_COLOR = {
 
 export default function WalletOverview({
   className,
-  address,
   blockchainSymbol,
+  address,
   balance,
   sent,
   received,
@@ -71,8 +69,8 @@ export default function WalletOverview({
   const sentUsdValue = convertToUsd(amountSent, blockchainSymbol);
   const receivedUsdValue = convertToUsd(amountReceived, blockchainSymbol);
 
-  const firstActiveFormatted = formatDate(firstActive);
-  const lastActiveFormatted = formatDate(lastActive);
+  const firstActiveFormatted = format(firstActive, "MMM d, yyyy");
+  const lastActiveFormatted = format(lastActive, "MMM d, yyyy");
 
   const verdict = getVerdict(riskScore);
 
@@ -101,7 +99,7 @@ export default function WalletOverview({
             </span>
           </div>
           <p className="text-2xl font-semibold">
-            {balance} {blockchainSymbol}
+            {balance} {blockchainSymbol.toUpperCase()}
           </p>
           <p className="mt-1 text-muted-foreground text-sm">
             ~ ${balanceUsdValue.toLocaleString()} USD
@@ -143,7 +141,7 @@ export default function WalletOverview({
             </span>
           </div>
           <p className="text-2xl font-semibold">
-            {amountSent} {blockchainSymbol}
+            {amountSent} {blockchainSymbol.toUpperCase()}
           </p>
           <p className="mt-1 text-muted-foreground text-sm">
             ~ ${sentUsdValue.toLocaleString()} USD
@@ -158,7 +156,7 @@ export default function WalletOverview({
             </span>
           </div>
           <p className="text-2xl font-semibold">
-            {amountReceived} {blockchainSymbol}
+            {amountReceived} {blockchainSymbol.toUpperCase()}
           </p>
           <p className="mt-1 text-muted-foreground text-sm">
             ~ ${receivedUsdValue.toLocaleString()} USD

@@ -3,6 +3,7 @@ export type Transaction = {
   sender: string;
   receiver: string;
   amount: number;
+  timestamp: Date;
 };
 
 export type Node = {
@@ -10,6 +11,7 @@ export type Node = {
   address: string;
   x: number;
   y: number;
+  radius: number;
 };
 
-export type BlockchainSymbol = "ETH" | "BNB" | "AVAX" | "MATIC" | "KLAY" | "SWC";
+export type BlockchainSymbol = "eth" | "bnb" | "avax" | "matic" | "klay" | "swc";
