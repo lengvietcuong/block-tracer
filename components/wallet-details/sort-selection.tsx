@@ -1,18 +1,21 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export default function SortSelection({
+  className,
   selected,
 }: {
+  className?: string;
   selected: "time" | "amount";
 }) {
   return (
-    <div className="flex gap-2">
+    <div className={cn("flex gap-2", className)}>
       <Link href="?sort=time">
         <Button
           variant="ghost"
           size="sm"
-          className={`text-xs ${selected === "time" ? "bg-muted" : ""}`}
+          className={`text-xs rounded-full px-3.5 h-8 ${selected === "time" ? "bg-muted" : ""}`}
         >
           Most recent
         </Button>
@@ -21,7 +24,7 @@ export default function SortSelection({
         <Button
           variant="ghost"
           size="sm"
-          className={`text-xs ${selected === "amount" ? "bg-muted" : ""}`}
+          className={`text-xs rounded-full px-3.5 h-8 ${selected === "amount" ? "bg-muted" : ""}`}
         >
           Most value
         </Button>

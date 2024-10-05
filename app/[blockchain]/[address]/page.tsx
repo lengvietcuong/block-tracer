@@ -30,7 +30,7 @@ export default function Home({
   return (
     <>
       <Header changeStyleOnScroll={false} />
-      <main className="spacing-section pt-5">
+      <main className="spacing-section pt-4">
         <WalletDetails
           blockchainSymbol={blockchainSymbol}
           address={address}

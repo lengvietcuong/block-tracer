@@ -30,40 +30,15 @@ export default function WalletDetails({
 }: WalletDetailsProps) {
   return (
     <>
-      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-5">
-        <SortSelection selected={sortOrder} />
-        <div className="self-stretch bg-muted border-l hidden md:block" />
-        <Suspense fallback={<PagesSkeleton />}>
-          <WalletOverviewWrapper
-            blockchainSymbol={blockchainSymbol}
-            address={address}
-            render={({ sent, received }) => {
-              const numPages = Math.ceil(
-                (sent + received) / TRANSACTIONS_PER_PAGE
-              );
-              return (
-                numPages > 1 && (
-                  <Pages
-                    className="justify-start"
-                    sortOrder={sortOrder}
-                    numPages={numPages}
-                    currentPage={currentPage}
-                  />
-                )
-              );
-            }}
-          />
-        </Suspense>
-      </div>
-      <div className="flex flex-col-reverse lg:flex-row gap-12 xl:gap-24 mb-12">
+      <SortSelection className="hidden lg:block" selected={sortOrder} />
+      <div className="flex flex-col-reverse lg:flex-row gap-12 xl:gap-24 mt-4 mb-12">
         <div className="flex-1">
+          <SortSelection className="lg:hidden mb-4" selected={sortOrder} />
           <h2 className="text-2xl lg:text-3xl font-bold mb-6">
             Transaction Graph
           </h2>
           <div className="w-fit mx-auto">
-            <Suspense
-              fallback={<TransactionGraphSkeleton />}
-            >
+            <Suspense fallback={<TransactionGraphSkeleton />}>
               <TransactionsWrapper
                 blockchainSymbol={blockchainSymbol}
                 address={address}
@@ -81,7 +56,9 @@ export default function WalletDetails({
             </Suspense>
           </div>
         </div>
+
         <div className="self-strech border-l border-muted hidden lg:block"></div>
+
         <div className="flex-1">
           <h2 className="text-2xl lg:text-3xl font-bold mb-6">
             Wallet Overview
@@ -117,6 +94,27 @@ export default function WalletDetails({
               transactions={transactions}
             />
           )}
+        />
+      </Suspense>
+      <Suspense fallback={<PagesSkeleton />}>
+        <WalletOverviewWrapper
+          blockchainSymbol={blockchainSymbol}
+          address={address}
+          render={({ sent, received }) => {
+            const numPages = Math.ceil(
+              (sent + received) / TRANSACTIONS_PER_PAGE
+            );
+            return (
+              numPages > 1 && (
+                <Pages
+                  className="mt-6"
+                  sortOrder={sortOrder}
+                  numPages={numPages}
+                  currentPage={currentPage}
+                />
+              )
+            );
+          }}
         />
       </Suspense>
     </>
