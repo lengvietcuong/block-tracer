@@ -75,7 +75,7 @@ export default function TransactionGraph({
     const sign = isSearchedWalletSender ? "-" : "+";
     const amount = `${sign}${transaction.amount.toFixed(
       2
-    )} ${blockchainSymbol}`;
+    )} ${blockchainSymbol.toUpperCase()}`;
 
     return (
       <g
@@ -141,7 +141,7 @@ export default function TransactionGraph({
     return (
       <Link
         key={node.id}
-        href={`/wallet?chain=${blockchainSymbol}&address=${node.address}`}
+        href={`/${blockchainSymbol}/${node.address}`}
         passHref
       >
         <g

@@ -1,4 +1,5 @@
 import Rand from "rand-seed";
+import { BlockchainSymbol } from "./types";
 
 function generateRandomAddress(rand: Rand) {
   let address = "0x";
@@ -20,8 +21,18 @@ function generateRandomTransactionID(rand: Rand) {
   return id;
 }
 
-export function getTransactions(address: string, start: number, end: number) {
-  const rand = new Rand(`${address}${start}${end}`);
+export async function getTransactions(
+  blockchainSymbol: BlockchainSymbol,
+  address: string,
+  sortOrder: "time" | "amount",
+  start: number,
+  end: number
+) {
+  // Simulate a delay of up to 1.5s
+  const delay = Math.floor(Math.random() * 1_500);
+  await new Promise((resolve) => setTimeout(resolve, delay));
+
+  const rand = new Rand(`${blockchainSymbol}-${address}-${sortOrder}-${start}-${end}`);
 
   const transactions = [];
   const count = end - start + 1;
@@ -29,16 +40,25 @@ export function getTransactions(address: string, start: number, end: number) {
   for (let i = 0; i < count; i++) {
     const isSender = rand.next() > 0.5;
     const randomAddress = generateRandomAddress(rand);
-    const amount = (rand.next() * 1).toFixed(2);
+    const amount = (rand.next() * 3).toFixed(4);
 
     transactions.push({
       id: generateRandomTransactionID(rand),
       sender: isSender ? address : randomAddress,
       receiver: isSender ? randomAddress : address,
       amount: parseFloat(amount),
+      timestamp: getRandomDate(new Date(2020, 0, 1), new Date(), rand),
     });
+
   }
 
+  transactions.sort((a, b) => {
+    if (sortOrder === "time") {
+      return b.timestamp.getTime() - a.timestamp.getTime();
+    } else {
+      return Math.abs(b.amount) - Math.abs(a.amount);
+    }
+  });
   return transactions;
 }
 
@@ -55,8 +75,12 @@ function getRiskScore(rand: Rand) {
     : 26 + Math.floor(rand.next() * 75);
 }
 
-export function getWalletOverview(address: string) {
-  const rand = new Rand(address);
+export async function getWalletOverview(blockchainSymbol: BlockchainSymbol, address: string) {
+  // Simulate a delay of up to 1.5s
+  const delay = Math.floor(Math.random() * 1_500);
+  await new Promise((resolve) => setTimeout(resolve, delay));
+
+  const rand = new Rand(`${blockchainSymbol}-${address}`);
 
   const sent = Math.floor(rand.next() * 100);
   const received = Math.floor(rand.next() * 100);

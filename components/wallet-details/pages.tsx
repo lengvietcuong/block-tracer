@@ -7,32 +7,40 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
-import { BlockchainSymbol } from "@/types";
 
 interface PagesProps {
   className?: string;
-  blockchainSymbol: BlockchainSymbol;
-  address: string;
+  sortOrder: "time" | "amount";
   numPages: number;
   currentPage: number;
 }
 
 export default function Pages({
   className,
-  blockchainSymbol,
-  address,
+  sortOrder,
   numPages,
   currentPage,
 }: PagesProps) {
   const maxPages = 3;
   const previous = Math.max(1, currentPage - 1);
   const next = Math.min(numPages, currentPage + 1);
+
+  // Determine the range of pages to display
+  const startPage = Math.max(
+    1,
+    Math.min(currentPage - Math.floor(maxPages / 2), numPages - maxPages + 1)
+  );
+  const endPage = Math.min(
+    numPages,
+    Math.max(currentPage + Math.floor(maxPages / 2), maxPages)
+  );
+
   return (
     <Pagination className={className}>
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
-            href={`?chain=${blockchainSymbol}&address=${address}&page=${previous}`}
+            href={`?sort=${sortOrder}&page=${previous}`}
             className={
               currentPage === 1
                 ? "pointer-events-none opacity-50"
@@ -40,30 +48,36 @@ export default function Pages({
             }
           />
         </PaginationItem>
+
+        {/* Render pagination links based on the dynamic start and end pages */}
         {Array.from(
           {
-            length: Math.min(maxPages, numPages),
+            length: endPage - startPage + 1,
           },
           (_, i) => (
             <PaginationItem key={i}>
               <PaginationLink
-                href={`?chain=${blockchainSymbol}&address=${address}&page=${i + 1}`}
-                isActive={currentPage === i + 1}
-                className="cursor-pointer"
+                href={`?sort=${sortOrder}&page=${startPage + i}`}
+                isActive={currentPage === startPage + i}
+                className={`cursor-pointer ${
+                  currentPage === startPage + i ? "bg-muted" : ""
+                }`}
               >
-                {i + 1}
+                {startPage + i}
               </PaginationLink>
             </PaginationItem>
           )
         )}
-        {numPages > maxPages && (
+
+        {numPages > endPage && (
           <PaginationItem>
             <PaginationEllipsis />
           </PaginationItem>
         )}
+
         <PaginationItem>
           <PaginationNext
-            href={`?chain=${blockchainSymbol}&address=${address}&page=${next}`}
+            href={`?sort=${sortOrder}&page=${next}`}
             className={
               currentPage === numPages
                 ? "pointer-events-none opacity-50"

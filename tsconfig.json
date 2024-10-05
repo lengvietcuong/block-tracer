@@ -26,7 +26,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "components/graphs/brain-graph.tsx"
+    "components/graphs/brain-graph.tsx",
+    "next.config.js"
   ],
   "exclude": ["node_modules"]
 }

@@ -6,14 +6,6 @@ export function convertToUsd(value: number, blockchainSymbol: BlockchainSymbol) 
   return parseFloat(convertedAmount.toFixed(2));
 }
 
-export function formatDate(date: Date) {
-  return date.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
 export function getTimeAgo(date: Date) {
   const now = new Date();
   const diff = now.getTime() - date.getTime();

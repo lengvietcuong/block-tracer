@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, ReactNode } from "react";
-import WalletSearch from "@/components/wallet-search";
+import WalletSearch from "@/components/wallet-details/wallet-search";
 
 interface HeaderWrapperProps {
   children: ReactNode;
@@ -35,7 +35,9 @@ function HeaderWrapper({
     >
       <div className="flex items-center max-w-screen-2xl mx-auto justify-between">
         {children}
-        {(scrolled || !changeStyleOnScroll) && <WalletSearch variant="compact"/>}
+        {(scrolled || !changeStyleOnScroll) && (
+          <WalletSearch variant="compact" />
+        )}
       </div>
     </header>
   );
