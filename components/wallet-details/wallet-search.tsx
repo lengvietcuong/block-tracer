@@ -6,20 +6,27 @@ import BlockchainSelection from "./blockchain-selection";
 import { BlockchainSymbol } from "@/types";
 import { useRouter } from "next/navigation";
 import { IoSearch as SearchIcon } from "react-icons/io5";
+import { TbLoader2 as LoadingIcon } from "react-icons/tb";
 
 interface WalletSearchProps {
   variant?: "full" | "compact";
+  showLoading?: boolean;
 }
 
-export default function WalletSearch({ variant = "full" }: WalletSearchProps) {
+export default function WalletSearch({
+  variant = "full",
+  showLoading = false,
+}: WalletSearchProps) {
   const [walletAddress, setWalletAddress] = useState("");
   const [blockchainSymbol, setBlockchainSymbol] =
     useState<BlockchainSymbol>("eth");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   function handleWalletSearch(event: FormEvent | MouseEvent) {
     event.preventDefault();
     if (walletAddress.trim()) {
+      setLoading(true);
       router.push(`/${blockchainSymbol}/${walletAddress}`);
     }
   }
@@ -39,8 +46,13 @@ export default function WalletSearch({ variant = "full" }: WalletSearchProps) {
           aria-label="Search wallet"
           className="absolute left-3 top-1/2 -translate-y-1/2 p-1"
           onClick={handleWalletSearch}
+          disabled={loading && showLoading}
         >
-          <SearchIcon className="size-5 fill-primary hover:fill-primary/90" />
+          {loading && showLoading ? (
+            <LoadingIcon className="size-5 animate-spin stroke-primary" />
+          ) : (
+            <SearchIcon className="size-5 fill-primary hover:fill-primary/90" />
+          )}
         </button>
         <Input
           type="text"
@@ -51,6 +63,7 @@ export default function WalletSearch({ variant = "full" }: WalletSearchProps) {
           className={`bg-transparent border-none pl-12
             ${variant === "full" ? "h-12" : "h-10  text-xs"}
           `}
+          disabled={loading && showLoading}
         />
       </div>
       <BlockchainSelection

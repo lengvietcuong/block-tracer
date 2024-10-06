@@ -13,7 +13,7 @@ export default function HeroSection() {
           Trace and visualize transactions on the blockchain with ease. Gain
           insights and discover patterns with powerful analytics.
         </p>
-        <WalletSearch variant="full" />
+        <WalletSearch variant="full" showLoading={true}/>
       </div>
       <BrainGraph className="aspect-[7/6] lg:ml-auto mx-auto w-[350px] md:w-[490px] max-w-full lg:w-[630px]" />
     </section>
