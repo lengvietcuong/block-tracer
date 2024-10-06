@@ -25,8 +25,8 @@ function BrandCard({ Icon, name }: BrandCardProps) {
 export default function TestimonialsSection() {
   return (
     <section className="spacing-section pb-20 md:pb-24">
-      <h2 className="text-center text-3xl md:text-4xl lg:text-5xl">
-        <span className="font-bold">Trusted</span> by the best.
+      <h2 className="heading-section">
+        <span className="font-bold text-primary">Trusted</span> by industry leaders
       </h2>
       <div className="mt-8 md:mt-10 lg:mt-12 flex mx-auto max-w-screen-lg justify-evenly">
         <BrandCard Icon={FacebookIcon} name="Facebook" />
