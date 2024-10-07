@@ -1,3 +1,5 @@
+// Component from shadcn/ui library.
+
 import { cn } from "@/lib/utils"
 
 function Skeleton({

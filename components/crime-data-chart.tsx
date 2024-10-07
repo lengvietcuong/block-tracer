@@ -40,8 +40,8 @@ export default function CrimeDataChart() {
           orientation="right"
           stroke="hsl(var(--muted-foreground))"
           tickFormatter={(value: number) => `$${value}B`}
-          domain={[0, 6]}
-          ticks={[0, 1, 2, 3, 4, 5, 6]}
+          domain={[0, 6]} // Define the range of the y-axis
+          ticks={[0, 1, 2, 3, 4, 5, 6]} // Define the indicators on the y-axis
         />
       </ComposedChart>
     </ResponsiveContainer>

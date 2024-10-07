@@ -22,25 +22,23 @@ export default function Pages({
   currentPage,
 }: PagesProps) {
   const maxPages = 3;
-  const previous = Math.max(1, currentPage - 1);
-  const next = Math.min(numPages, currentPage + 1);
+  const previousPage = Math.max(1, currentPage - 1);
+  const nextPage = Math.min(numPages, currentPage + 1);
 
   // Determine the range of pages to display
-  const startPage = Math.max(
-    1,
-    Math.min(currentPage - Math.floor(maxPages / 2), numPages - maxPages + 1)
-  );
-  const endPage = Math.min(
-    numPages,
-    Math.max(currentPage + Math.floor(maxPages / 2), maxPages)
-  );
+  // Try to keep the current page in the middle
+  let startPage = currentPage - Math.floor(maxPages / 2);
+  startPage = Math.max(1, startPage);
+  startPage = Math.min(startPage, numPages - maxPages + 1);
+  const endPage = Math.min(startPage + maxPages - 1, numPages);
 
   return (
     <Pagination className={className}>
       <PaginationContent>
+        {/* Previous button */}
         <PaginationItem>
           <PaginationPrevious
-            href={`?sort=${sortOrder}&page=${previous}`}
+            href={`?sort=${sortOrder}&page=${previousPage}`}
             className={
               currentPage === 1
                 ? "pointer-events-none opacity-50"
@@ -49,7 +47,7 @@ export default function Pages({
           />
         </PaginationItem>
 
-        {/* Render pagination links based on the dynamic start and end pages */}
+        {/* Pages */}
         {Array.from(
           {
             length: endPage - startPage + 1,
@@ -69,15 +67,17 @@ export default function Pages({
           )
         )}
 
+        {/* "..." if there are too many pages to be shown at once */}
         {numPages > endPage && (
           <PaginationItem>
             <PaginationEllipsis />
           </PaginationItem>
         )}
 
+        {/* Next button */}
         <PaginationItem>
           <PaginationNext
-            href={`?sort=${sortOrder}&page=${next}`}
+            href={`?sort=${sortOrder}&page=${nextPage}`}
             className={
               currentPage === numPages
                 ? "pointer-events-none opacity-50"

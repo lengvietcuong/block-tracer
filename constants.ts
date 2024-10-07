@@ -6,7 +6,7 @@ export const BLOCKCHAIN_NAMES: Record<BlockchainSymbol, string> = {
   avax: "Avalanche",
   matic: "Polygon",
   klay: "Klaytn",
-  swc: "Swincoin",
+  swc: "Swincoin", // Imaginary coin
 };
 
 export const USD_VALUE: Record<BlockchainSymbol, number> = {

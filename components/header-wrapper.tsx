@@ -12,15 +12,18 @@ function HeaderWrapper({
   children,
   changeStyleOnScroll = true,
 }: HeaderWrapperProps) {
+  // Keep track of whether the user has scrolled down the page
+  // If changeStyleOnScroll is true, when scrolled, the header will have a background and the search bar will be shown
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     function handleScroll() {
-      setScrolled(window.scrollY > 50);
+      setScrolled(window.scrollY > 50); // 50px from the top of the page
     }
 
     document.addEventListener("scroll", handleScroll);
     return () => {
+      // Cleanup function when the component unmounts
       document.removeEventListener("scroll", handleScroll);
     };
   }, [scrolled]);

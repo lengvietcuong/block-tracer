@@ -20,8 +20,10 @@ export function getTimeAgo(date: Date) {
     { unit: "second", value: Math.floor(diff / 1000) },
   ];
 
+  // Find the first non-zero unit and return the corresponding string
   for (const { unit, value } of times) {
     if (value > 0) {
+      // Append "s" for plural units
       return `${value} ${unit}${value > 1 ? "s" : ""} ago`;
     }
   }

@@ -13,7 +13,8 @@ export default function HeroSection() {
           Trace and visualize transactions on the blockchain with ease. Gain
           insights and discover patterns with powerful analytics.
         </p>
-        <WalletSearch variant="full" showLoading={true}/>
+        {/* After the user presses enter or clicks the search icon, the search bar component will display a loading spinner until they are redirected to the wallet details page. */}
+        <WalletSearch variant="full" showLoading={true} />
       </div>
       <BrainGraph className="aspect-[7/6] lg:ml-auto mx-auto w-[350px] md:w-[490px] max-w-full xl:w-[630px]" />
     </section>

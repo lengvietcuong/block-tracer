@@ -1,4 +1,4 @@
-import CrimeDataChart from "../crime-data-chart";
+import CrimeDataChart from "@/components/crime-data-chart";
 import { PiArrowUpRightBold as UpRightArrowIcon } from "react-icons/pi";
 
 export default function CrimeDataSection() {

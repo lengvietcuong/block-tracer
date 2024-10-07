@@ -28,9 +28,15 @@ export default function WalletDetails({
   sortOrder,
   currentPage,
 }: WalletDetailsProps) {
+  // This component uses Suspense boundaries to separate dynamic elements from static ones
+  // The static components are rendered immediately
+  // The dynamic components that need to fetch data will be streamed in later
+  // When data is being fetched, loading skeletons are displayed (by setting the "fallback" attribute)
+
   return (
     <>
       <SortSelection className="hidden lg:block" selected={sortOrder} />
+
       <div className="flex flex-col-reverse lg:flex-row gap-12 xl:gap-24 mt-4 mb-12">
         <div className="flex-1">
           <SortSelection className="lg:hidden mb-4" selected={sortOrder} />
@@ -57,6 +63,7 @@ export default function WalletDetails({
           </div>
         </div>
 
+        {/* This div renders a vertical line to separate the transaction graph and the wallet overview */}
         <div className="self-strech border-l border-muted hidden lg:block"></div>
 
         <div className="flex-1">
@@ -78,6 +85,7 @@ export default function WalletDetails({
           </Suspense>
         </div>
       </div>
+
       <h2 className="text-2xl lg:text-3xl font-bold mb-6">
         Transaction History
       </h2>
@@ -96,6 +104,7 @@ export default function WalletDetails({
           )}
         />
       </Suspense>
+
       <Suspense fallback={<PagesSkeleton />}>
         <WalletOverviewWrapper
           blockchainSymbol={blockchainSymbol}
@@ -104,6 +113,7 @@ export default function WalletDetails({
             const numPages = Math.ceil(
               (sent + received) / TRANSACTIONS_PER_PAGE
             );
+            // Only render the pagination component if there are more than one page
             return (
               numPages > 1 && (
                 <Pages
@@ -121,6 +131,12 @@ export default function WalletDetails({
   );
 }
 
+// Because there are multiple components that need access to the same data, caching is used to prevent redundant API calls
+// The cache is cleared when the user refreshes the page
+const getCachedWalletOverview = cache(
+  (blockchainSymbol: BlockchainSymbol, address: string) =>
+    getWalletOverview(blockchainSymbol, address)
+);
 const getCachedTransactions = cache(
   (
     blockchainSymbol: BlockchainSymbol,
@@ -131,6 +147,7 @@ const getCachedTransactions = cache(
   ) => getTransactions(blockchainSymbol, address, sortOrder, start, end)
 );
 
+// The transaction wrapper provides the fetched transaction data to its child components
 interface TransactionsWrapperProps {
   blockchainSymbol: BlockchainSymbol;
   address: string;
@@ -159,11 +176,7 @@ async function TransactionsWrapper({
   return <>{render(transactions)}</>;
 }
 
-const getCachedWalletOverview = cache(
-  (blockchainSymbol: BlockchainSymbol, address: string) =>
-    getWalletOverview(blockchainSymbol, address)
-);
-
+// The wallet overview wrapper provides the fetched wallet overview data to its child components
 interface WalletOverviewWrapperProps {
   address: string;
   blockchainSymbol: BlockchainSymbol;

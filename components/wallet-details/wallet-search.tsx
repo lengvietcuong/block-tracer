@@ -24,14 +24,17 @@ export default function WalletSearch({
   const router = useRouter();
 
   function handleWalletSearch(event: FormEvent | MouseEvent) {
-    event.preventDefault();
+    event.preventDefault(); // Prevent a full page reload
     if (walletAddress.trim()) {
       setLoading(true);
+      // Redirect the user to the appropriate wallet details page
       router.push(`/${blockchainSymbol}/${walletAddress}`);
     }
   }
 
   return (
+    // Render a larger size search bar with a soft white shadow in the full variant (in the hero section)
+    // In the header, render a smaller version without the shadow
     <form
       id="wallet-search"
       className={`flex items-center rounded-lg ${
@@ -48,6 +51,7 @@ export default function WalletSearch({
           onClick={handleWalletSearch}
           disabled={loading && showLoading}
         >
+          {/* If showLoading is true (in the hero section), after the user presses enter or clicks the search icon, the search bar component will display a loading spinner until they are redirected to the wallet details page. */}
           {loading && showLoading ? (
             <LoadingIcon className="size-5 animate-spin stroke-primary" />
           ) : (

@@ -1,3 +1,5 @@
+// Component from shadcn/ui library.
+
 "use client"
 
 import * as React from "react"

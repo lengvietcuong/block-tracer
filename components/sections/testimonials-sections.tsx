@@ -14,6 +14,7 @@ interface BrandCardProps {
 }
 
 function BrandCard({ Icon, name }: BrandCardProps) {
+  // This component renders a square card containing the brand logo and name, with a soft white shadow 
   return (
     <div className="rounded shadow-[0_0_20px_5px_hsl(var(--muted-foreground)/0.25)] size-16 md:size-24 lg:size-36 border flex justify-center items-center flex-col gap-2">
       <Icon className="size-6 md:size-9 lg:size-12" />
@@ -41,6 +42,7 @@ export default function TestimonialsSection() {
         </div>
         <div className="border-l self-stretch border-muted"></div>
         <div>
+          {/* He didn't say this */}
           <p className="italic lg:text-lg">
             Block Tracer is truly an incredible platform for transaction
             tracing. I can&apos;t imagine how the world would be like without

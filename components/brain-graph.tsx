@@ -5,7 +5,7 @@ import "reactflow/dist/style.css";
 import brainPolygon from "@/public/brain-polygon.json";
 import { FaRegUser as UserIcon } from "react-icons/fa";
 
-const NUM_EDGES = 100;
+const NUM_EDGES = 100; // Create 100 random connections between the nodes each time
 const nodeTypes = {
   brain: BrainNode,
 };
@@ -27,7 +27,7 @@ function createEdge(source: number, target: number) {
     style: {
       stroke: "hsl(var(--muted-foreground))",
       strokeWidth: 1,
-      strokeOpacity: Math.random(),
+      strokeOpacity: Math.random(), // Render varying opacities for a "layered" effect
     },
     type: "straight",
     animated: true,
@@ -37,9 +37,15 @@ function createEdge(source: number, target: number) {
 function BrainNode({ data }: NodeProps) {
   return (
     <div className="relative size-8 lg:size-6" title={data.label}>
+      {/* Place the input and output handles in the center of the node */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <Handle type="source" position={Position.Left} className="invisible" />
       </div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <Handle type="target" position={Position.Left} className="invisible" />
+      </div>
+
+      {/* If the node is selected (indicating a criminal), render it in red; otherwise, render it in green */}
       <div
         className={`grid place-items-center size-full rounded-full border ${
           data.selected ? "border-destructive/50" : "border-primary/50"
@@ -51,9 +57,6 @@ function BrainNode({ data }: NodeProps) {
           }`}
         />
       </div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        <Handle type="target" position={Position.Left} className="invisible" />
-      </div>
     </div>
   );
 }
@@ -63,6 +66,7 @@ export default function BrainGraph({ className }: { className?: string }) {
     createNode(index + 1, point.x, point.y, point.selected)
   );
 
+  // Generate random connections between the nodes
   const initialEdges: Edge[] = [];
   for (let i = 0; i < NUM_EDGES; i++) {
     const source = Math.floor(Math.random() * initialNodes.length) + 1;
@@ -72,6 +76,7 @@ export default function BrainGraph({ className }: { className?: string }) {
     }
   }
 
+  // Draw the graph with interactivity disabled
   return (
     <div className={className}>
       <ReactFlow

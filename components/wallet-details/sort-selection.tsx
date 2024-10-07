@@ -10,6 +10,8 @@ export default function SortSelection({
   selected: "time" | "amount";
 }) {
   return (
+    // Update the sort order by changing the query parameter in the URL
+    // When the sort order is updated, the page number is implicitly reset to 1
     <div className={cn("flex gap-2", className)}>
       <Link href="?sort=time">
         <Button

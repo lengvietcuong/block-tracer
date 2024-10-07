@@ -10,8 +10,13 @@ interface FeatureCardProps {
 
 function FeatureCard({ icon: Icon, title, description }: FeatureCardProps) {
   return (
-    <div className="relative overflow-hidden max-w-sm p-6 md:p-8 rounded border bg-dot-white/[0.2]">
+    <div className="relative overflow-hidden max-w-sm p-6 md:p-8 rounded border">
+      {/* This div renders a dot pattern that fades from top to bottom */}
+      <div className="absolute inset-0 bg-dot-white/25 -z-20 before:absolute before:inset-0 before:bg-gradient-to-b before:from-transparent before:to-background" />
+
+      {/* This div renders a soft radial light from the top */}
       <div className="opacity-25 absolute top-0 left-1/2 -translate-y-1/2 -translate-x-1/2 block bg-[radial-gradient(farthest-side,hsl(var(--primary)),rgba(0,0,0,0))] w-full h-1/2 -z-10" />
+      
       <Icon className="size-20 lg:size-24 text-primary" />
       <div>
         <h3 className="mt-3 md:mt-5 font-bold text-lg md:text-xl lg:text-2xl">
