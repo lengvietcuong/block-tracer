@@ -9,6 +9,7 @@ export default function Header({
 }) {
   return (
     <HeaderWrapper changeStyleOnScroll={changeStyleOnScroll}>
+      {/* Clicking on the logo takes the user back to the home page */}
       <Link href="/" aria-label="Back to Home" >
         <div className="flex items-center gap-4">
           <Logo className="size-10 fill-primary" />

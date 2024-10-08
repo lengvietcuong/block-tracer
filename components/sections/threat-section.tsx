@@ -1,7 +1,7 @@
 import CrimeDataChart from "@/components/crime-data-chart";
 import { PiArrowUpRightBold as UpRightArrowIcon } from "react-icons/pi";
 
-export default function CrimeDataSection() {
+export default function ThreatSection() {
   return (
     <section className="spacing-section">
       <h2 className="heading-section">

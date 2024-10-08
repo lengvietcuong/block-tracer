@@ -8,6 +8,7 @@ interface AchievementStatProps {
 function AchievementStat({ value, description }: AchievementStatProps) {
   return (
     <div>
+      {/* Use a gradient to create a slightly faded effect at the end of the text */}
       <p className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-foreground to-muted">
         {value}
       </p>

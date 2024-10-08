@@ -21,6 +21,7 @@ interface ContactItemProps {
 }
 
 function SocialNetwork({ Icon, name }: SocialNetworkProps) {
+  // Renders the logo of the social network that is hyperlinked to its homepage
   return (
     <li>
       <a
@@ -36,6 +37,7 @@ function SocialNetwork({ Icon, name }: SocialNetworkProps) {
 }
 
 function ContactItem({ Icon, text, href }: ContactItemProps) {
+  // Renders a contact item with an icon and text that is hyperlinked
   return (
     <a
       className="flex items-center text-sm text-muted-foreground hover:text-foreground"

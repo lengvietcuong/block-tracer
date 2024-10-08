@@ -6,6 +6,7 @@ export type Transaction = {
   timestamp: Date;
 };
 
+// Represents a node in the transaction graph
 export type Node = {
   id: string;
   address: string;

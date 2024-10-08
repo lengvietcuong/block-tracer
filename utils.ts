@@ -2,6 +2,7 @@ import { USD_VALUE } from "./constants";
 import { BlockchainSymbol } from "./types";
 
 export function convertToUsd(value: number, blockchainSymbol: BlockchainSymbol) {
+  // Converts an amount in crypto to USD
   const convertedAmount = value * USD_VALUE[blockchainSymbol];
   return parseFloat(convertedAmount.toFixed(2));
 }

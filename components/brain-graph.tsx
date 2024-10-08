@@ -2,7 +2,7 @@
 
 import ReactFlow, { Edge, Node, NodeProps, Handle, Position } from "reactflow";
 import "reactflow/dist/style.css";
-import brainPolygon from "@/public/brain-polygon.json";
+import brainPolygon from "@/public/brain-polygon.json"; // Coordinates of all the nodes
 import { FaRegUser as UserIcon } from "react-icons/fa";
 
 const NUM_EDGES = 100; // Create 100 random connections between the nodes each time
