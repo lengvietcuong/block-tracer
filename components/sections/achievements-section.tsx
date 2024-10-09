@@ -1,4 +1,5 @@
 import Globe from "@/components/ui/globe";
+import ClientOnly from "@/components/client-only";
 
 interface AchievementStatProps {
   value: string;
@@ -25,7 +26,10 @@ export default function AchievementsSection() {
       </h2>
       <div className="flex-col md:flex-row gap-4 lg:gap-16 flex items-center">
         <div className="flex-shrink-0 size-[360px] md:size-[440px] lg:size-[600px]">
-          <Globe />
+          {/* Render the globe component only on the client side (do not prerender on the server because that causes issues for some reason) */}
+          <ClientOnly>
+            <Globe />
+          </ClientOnly>
         </div>
         <div className="space-y-6 lg:space-y-12 text-center md:text-left">
           <AchievementStat value="72,000+" description="wallets analyzed" />
