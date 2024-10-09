@@ -18,7 +18,7 @@ export default function CopyButton({ content }: { content: string }) {
     navigator.clipboard.writeText(content);
     // Setting the copied state to true will show the checkmark icon
     setCopied(true);
-    setTimeout(() => setCopied(false), 1_000);  // The checkmark icon will disappear after 1 second
+    setTimeout(() => setCopied(false), 1_000); // The checkmark icon will disappear after 1 second
   }
 
   return (
@@ -27,6 +27,7 @@ export default function CopyButton({ content }: { content: string }) {
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
+            aria-label="Copy"
             variant="ghost"
             size="icon"
             className="size-6"
