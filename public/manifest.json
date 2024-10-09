@@ -1,8 +1,6 @@
 {
-    "theme_color": "#050505",
-    "background_color": "#08e267",
-    "scope": "/",
-    "start_url": "/",
+    "theme_color": "#1de245",
+    "background_color": "#070c0e",
     "icons": [
         {
             "purpose": "maskable",
@@ -21,6 +19,8 @@
     "display": "standalone",
     "dir": "auto",
     "lang": "vi-VN",
-    "name": "Block tracer",
-    "short_name": "trace"
+    "name": "Block Tracer",
+    "short_name": "HD Tracker",
+    "scope": "/",
+    "start_url": "/"
 }

@@ -1,6 +1,7 @@
 import HeaderWrapper from "./header-wrapper";
 import Logo from "@/components/icons/logo";
 import Link from "next/link";
+import PWAINstallButton from "./PWA_install_button";
 
 export default function Header({
   changeStyleOnScroll,
@@ -16,6 +17,7 @@ export default function Header({
           <p className="font-bold hidden sm:block text-xl">Block Tracer</p>
         </div>
       </Link>
+      <PWAINstallButton />
     </HeaderWrapper>
   );
 }
