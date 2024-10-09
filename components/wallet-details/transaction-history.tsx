@@ -47,12 +47,15 @@ export default function TransactionHistory({
       <TableBody>
         {transactions.map((transaction) => (
           <TableRow key={transaction.id} className="">
+            {/* Transaction ID attribute */}
             <TableCell title={transaction.id}>
               <div className="flex items-center gap-2">
                 <span className="truncate">{transaction.id}</span>
                 <CopyButton content={transaction.id} />
               </div>
             </TableCell>
+            
+            {/* Sender and receiver attributes */}
             <TableCell>
               <div className="flex items-center gap-2">
                 <p
@@ -82,6 +85,8 @@ export default function TransactionHistory({
                 <CopyButton content={transaction.receiver} />
               </div>
             </TableCell>
+
+            {/* Transaction amount attribute */}
             <TableCell
               title={`${transaction.amount} ${blockchainSymbol.toUpperCase()}`}
             >

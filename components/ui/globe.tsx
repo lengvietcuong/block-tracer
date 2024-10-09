@@ -1,3 +1,5 @@
+// Component from react-cobe library.
+
 "use client";
 
 import createGlobe, { Marker } from "cobe";

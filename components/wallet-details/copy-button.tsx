@@ -7,7 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { PiCopySimpleBold as CopyIcon } from "react-icons/pi";
 import { PiCheckCircleBold as CheckmarkIcon } from "react-icons/pi";
 
@@ -16,11 +16,13 @@ export default function CopyButton({ content }: { content: string }) {
 
   function copyToClipboard() {
     navigator.clipboard.writeText(content);
+    // Setting the copied state to true will show the checkmark icon
     setCopied(true);
-    setTimeout(() => setCopied(false), 1_000);
+    setTimeout(() => setCopied(false), 1_000);  // The checkmark icon will disappear after 1 second
   }
 
   return (
+    // Set delayDuration to 0 to show the "Copy" text immediately when the user hovers over the button
     <TooltipProvider delayDuration={0}>
       <Tooltip>
         <TooltipTrigger asChild>

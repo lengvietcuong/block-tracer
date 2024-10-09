@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* The colors are taken from the dark green theme of shadcn/ui */
 @layer base {
   :root {
     --background: 20 14.3% 4.1%;
@@ -41,8 +42,13 @@
   }
 }
 
+/* This defines custom reusable classes */
 @layer components {
+  .heading-section {
+    @apply text-3xl md:text-4xl lg:text-5xl text-center;
+  }
+
   .spacing-section {
-    @apply py-8 md:py-10 lg:py-12 px-4 md:px-8 lg:px-12 xl:px-28 max-w-screen-2xl mx-auto;
+    @apply py-10 md:py-12 lg:py-16 px-4 md:px-8 lg:px-12 xl:px-28 max-w-screen-2xl mx-auto;
   }
 }

@@ -17,6 +17,7 @@ export function TransactionGraphSkeleton() {
 export function WalletOverviewSkeleton() {
   return (
     <div className="space-y-8">
+      {/* Skeleton for the wallet address and copy button */}
       <div>
         <div className="flex items-center mb-2.5">
           <Skeleton className="size-4 rounded-full mr-1.5" />
@@ -30,6 +31,7 @@ export function WalletOverviewSkeleton() {
       </div>
 
       <div className="flex sm:justify-between flex-col sm:flex-row space-y-8 sm:space-y-0">
+        {/* Skeleton for the wallet's balance info */}
         <div>
           <div className="flex items-center mb-2.5">
             <Skeleton className="size-4 rounded-full mr-1.5" />
@@ -39,6 +41,7 @@ export function WalletOverviewSkeleton() {
           <Skeleton className="h-4 w-24" />
         </div>
 
+        {/* Skeletons for the number of transactions (sent, received, total) */}
         <div>
           <div className="flex sm:justify-end items-center mb-2.5">
             <Skeleton className="size-4 rounded-full mr-1.5" />
@@ -55,6 +58,7 @@ export function WalletOverviewSkeleton() {
         </div>
       </div>
 
+      {/* Skeletons for the total amount sent & received, as well as the first and last active times */}
       {[0, 1].map((index) => (
         <div key={index} className="flex justify-between gap-6">
           {[0, 1].map((i) => (
@@ -73,7 +77,8 @@ export function WalletOverviewSkeleton() {
           ))}
         </div>
       ))}
-
+      
+      {/* Skeleton for the risk score */}
       <div>
         <div className="flex items-center mb-2.5">
           <Skeleton className="size-4 rounded-full mr-1.5" />
@@ -109,20 +114,15 @@ export function TransactionHistorySkeleton() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {[0, 1, 2, 3, 4].map((index) => (
-          <TableRow key={index}>
-            <TableCell>
-              <Skeleton className="h-10 w-full" />
-            </TableCell>
-            <TableCell>
-              <Skeleton className="h-10 w-full" />
-            </TableCell>
-            <TableCell>
-              <Skeleton className="h-10 w-full" />
-            </TableCell>
-            <TableCell>
-              <Skeleton className="h-10 w-full" />
-            </TableCell>
+        {/* Render skeletons for 5 table rows */}
+        {[0, 1, 2, 3, 4].map((rowIndex) => (
+          <TableRow key={rowIndex}>
+            {/* For each row, render skeletons for each of the 4 columns */}
+            {[0, 1, 2, 3].map((colIndex) => (
+              <TableCell key={colIndex}>
+                <Skeleton className="h-10 w-full" />
+              </TableCell>
+            ))}
           </TableRow>
         ))}
       </TableBody>

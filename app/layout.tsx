@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto_Mono } from "next/font/google";
 import "./globals.css";
 
+// The Roboto Mono font is used throughout the application
 const robotoMono = Roboto_Mono({
   subsets: ["latin"],
   display: "swap",

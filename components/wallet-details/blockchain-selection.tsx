@@ -7,12 +7,12 @@ import {
 } from "@/components/ui/select";
 import { BlockchainSymbol } from "@/types";
 import { BLOCKCHAIN_NAMES } from "@/constants";
-import Etherium from "../icons/etherium";
-import Binance from "../icons/binance";
-import Avalanche from "../icons/avalanche";
-import Polygon from "../icons/polygon";
-import Klaytn from "../icons/klaytn";
-import Swincoin from "../icons/swincoin";
+import Etherium from "@/components/icons/etherium";
+import Binance from "@/components/icons/binance";
+import Avalanche from "@/components/icons/avalanche";
+import Polygon from "@/components/icons/polygon";
+import Klaytn from "@/components/icons/klaytn";
+import Swincoin from "@/components/icons/swincoin";
 
 const BLOCKCHAIN_ICONS = {
   eth: Etherium,
@@ -47,16 +47,17 @@ export default function BlockchainSelection({
   return (
     <Select value={blockchainSymbol} onValueChange={setBlockchainSymbol}>
       <SelectTrigger
-        id="blockchainSymbol"
-        aria-label="Select blockchainSymbol"
+        id="blockchain-symbol"
+        aria-label="Select blockchain symbol"
         className={className}
       >
         <SelectValue placeholder="Blockchain" />
       </SelectTrigger>
+      {/* Render all the supported blockchains */}
       <SelectContent side="bottom">
         {Object.keys(BLOCKCHAIN_NAMES).map((key) => (
           <SelectItem key={key} value={key}>
-            {renderBlockchain(key as keyof typeof BLOCKCHAIN_NAMES)}
+            {renderBlockchain(key as BlockchainSymbol)}
           </SelectItem>
         ))}
       </SelectContent>

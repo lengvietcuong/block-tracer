@@ -63,8 +63,10 @@ export default function WalletOverview({
   lastActive,
   riskScore,
 }: WalletOverviewProps) {
+  // Get the full blockchain name from its symbol (e.g. "eth" -> "Ethereum")
   const blockchainName = BLOCKCHAIN_NAMES[blockchainSymbol];
 
+  // Convert from crypto to USD
   const balanceUsdValue = convertToUsd(balance, blockchainSymbol);
   const sentUsdValue = convertToUsd(amountSent, blockchainSymbol);
   const receivedUsdValue = convertToUsd(amountReceived, blockchainSymbol);
@@ -76,6 +78,7 @@ export default function WalletOverview({
 
   return (
     <div className={cn("space-y-8", className)}>
+      {/* Render the wallet address with the copy button */}
       <div>
         <div className="flex items-center mb-1.5">
           <WalletIcon className="text-primary mr-1.5" />
@@ -91,6 +94,7 @@ export default function WalletOverview({
       </div>
 
       <div className="flex sm:justify-between flex-col sm:flex-row space-y-8 sm:space-y-0">
+        {/* Render the wallet's balance */}
         <div>
           <div className="flex items-center mb-1.5">
             <CoinsIcon className="text-primary mr-1.5" />
@@ -106,6 +110,7 @@ export default function WalletOverview({
           </p>
         </div>
 
+        {/* Render the number of transactions (sent, received, total) */}
         <div>
           <div className="flex sm:justify-end items-center mb-1.5">
             <TransactionIcon className="text-primary mr-1.5" />
@@ -133,6 +138,7 @@ export default function WalletOverview({
       </div>
 
       <div className="flex justify-between gap-6">
+        {/* Render the total amount of money sent and received */}
         <div>
           <div className="flex items-center mb-1.5">
             <MinusIcon className="text-primary mr-1.5" />
@@ -164,6 +170,7 @@ export default function WalletOverview({
         </div>
       </div>
 
+      {/* Render the first and last active times */}
       <div className="flex justify-between gap-6">
         <div>
           <div className="flex items-center mb-1.5">
@@ -192,6 +199,7 @@ export default function WalletOverview({
         </div>
       </div>
 
+      {/* Render the risk score */}
       <div>
         <div className="flex items-center mb-1.5">
           <InfoIcon className="text-primary mr-1.5" />
