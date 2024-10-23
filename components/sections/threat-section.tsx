@@ -20,8 +20,8 @@ export default function ThreatSection() {
         </a>
         <UpRightArrowIcon className="inline-block ml-1 peer peer-hover:fill-foreground transition-colors" />
       </p>
-      <div className="flex flex-col lg:flex-row mt-6 md:mt-9 lg:mt-12 gap-12">
-        <div className="w-full lg:w-1/2 flex-shrink-0 h-96">
+      <div className="flex flex-col lg:flex-row mt-6 md:mt-9 lg:mt-12 gap-8 md:gap-10 lg:gap-20">
+        <div className="w-full lg:w-1/2 flex-shrink-0">
           <h3 className="font-bold text-center text-lg md:text-xl lg:text-2xl">
             Loss from crypto fraud
           </h3>
