@@ -5,14 +5,17 @@ import { BlockchainSymbol } from "./types";
 const API_URL = 'https://graphql.bitquery.io/';
 const API_KEY = 'BQYPukAzSxvupCs722VUSymBjMiNEuWP';
 
+let success = 0;
+let fail = 0;
+
 const headers = {
   'Content-Type': 'application/json',
   'X-API-KEY': API_KEY,
 };
-function getRiskScore(rand: Rand) {
-  return rand.next() < 2 / 3
-    ? Math.floor(rand.next() * 26)  // Lower risk (0-25) for 2/3 of cases
-    : 26 + Math.floor(rand.next() * 75);  // Higher risk (26-100) for the rest
+function getRiskScore() {
+  if (success + fail > 0)
+    return parseInt(((1 - (success / (success + fail))) * 100).toFixed(0));
+  else return 0;
 }
 
 export async function getTransactions(
@@ -32,7 +35,7 @@ export async function getTransactions(
   const queryToAddress = `
   {
     ethereum(network: ${coin}) {
-      transactions(txTo: {is: "${address}"}, options: {limit: 100}) {
+      transactions(txTo: {is: "${address}"}, options: {limit: 10000}) {
         block {
           timestamp { unixtime }
           height
@@ -45,6 +48,7 @@ export async function getTransactions(
         gasPrice
         gas
         index
+        success
       }
     }
   }`;
@@ -52,7 +56,7 @@ export async function getTransactions(
   const queryFromAddress = `
   {
     ethereum(network: ${coin}) {
-      transactions(txSender: {is: "${address}"}, options: {limit: 100}) {
+      transactions(txSender: {is: "${address}"}, options: {limit: 10000}) {
         block {
           timestamp { unixtime }
           height
@@ -65,6 +69,7 @@ export async function getTransactions(
         gasPrice
         gas
         index
+        success
       }
     }
   }`;
@@ -78,18 +83,28 @@ export async function getTransactions(
 
     const toTransactions = toResponse.data.data.ethereum.transactions;
     const fromTransactions = fromResponse.data.data.ethereum.transactions;
+    success = 0;
+    fail = 0;
     
-    const allTransactions = [...toTransactions, ...fromTransactions].map((tx: any) => ({
-      sender: tx.sender.address,
-      receiver: tx.to.address,
-      id: tx.hash,
-      amount: tx.amount,
-      gasUsed: tx.gasValue / tx.gasPrice,
-      gasPrice: tx.gasPrice,
-      transactionFee: tx.gasValue,
-      blockNumber: tx.block.height,
-      timestamp: new Date(tx.block.timestamp.unixtime),
-    }));
+    const allTransactions = [...toTransactions, ...fromTransactions].map((tx: any) => {
+      if(tx.success === true){
+        success++;
+      } else {
+        fail++;
+      }
+    
+      return {
+        sender: tx.sender.address,
+        receiver: tx.to.address,
+        id: tx.hash,
+        amount: tx.amount,
+        gasUsed: tx.gasValue / tx.gasPrice,
+        gasPrice: tx.gasPrice,
+        transactionFee: tx.gasValue,
+        blockNumber: tx.block.height,
+        timestamp: new Date(tx.block.timestamp.unixtime),
+      };
+    });
 
     allTransactions.sort((a, b) => {
       if (sortOrder === "time") {
@@ -159,7 +174,7 @@ export async function getWalletOverview(initcoin: BlockchainSymbol, address: str
       received: walletDetails.receiveFromCount,
       firstActive: new Date(walletDetails.firstTransferAt.unixtime),
       lastActive: new Date(walletDetails.lastTransferAt.unixtime),
-      riskScore: getRiskScore(new Rand(`${initcoin}-${address}`)),
+      riskScore: getRiskScore(),
     };
   } catch (error) {
     console.error('Error fetching wallet details:', error);
