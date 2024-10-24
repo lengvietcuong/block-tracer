@@ -1,5 +1,12 @@
 import { BlockchainSymbol } from "./types";
 import api from "@/components/api";
+import Rand from "rand-seed";
+
+function getRiskScore(rand: Rand) {
+    return rand.next() < 2 / 3
+      ? Math.floor(rand.next() * 26)  // Lower risk (0-25) for 2/3 of cases
+      : 26 + Math.floor(rand.next() * 75);  // Higher risk (26-100) for the rest
+  }
 
 export async function getTransactions(
   blockchainSymbol: BlockchainSymbol,
@@ -63,7 +70,7 @@ export async function getWalletOverview(blockchainSymbol: BlockchainSymbol, addr
     const firstActive = new Date(response.data.firstTransferAt);
     const lastActive = new Date(response.data.lastTransferAt);
   
-    const riskScore = 10;
+    const riskScore = getRiskScore(new Rand(`${blockchainSymbol}-${address}`));
   
     return {
       balance,

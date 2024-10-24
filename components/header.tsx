@@ -17,7 +17,6 @@ export default function Header({
           <p className="font-bold hidden sm:block text-xl">Block Tracer</p>
         </div>
       </Link>
-      <PWAINstallButton />
     </HeaderWrapper>
   );
 }
