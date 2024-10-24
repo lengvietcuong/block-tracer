@@ -18,8 +18,7 @@ export default function WalletSearch({
   showLoading = false,
 }: WalletSearchProps) {
   const [walletAddress, setWalletAddress] = useState("");
-  const [blockchainSymbol, setBlockchainSymbol] =
-    useState<BlockchainSymbol>("eth");
+  const [blockchainSymbol, setBlockchainSymbol] = useState<BlockchainSymbol>("eth");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 

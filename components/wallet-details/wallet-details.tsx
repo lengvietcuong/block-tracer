@@ -10,8 +10,8 @@ import {
   TransactionHistorySkeleton,
   PagesSkeleton,
 } from "@/components/wallet-details/skeletons";
-import { getWalletOverview, getTransactions } from "@/randomData";
 import { BlockchainSymbol, Transaction } from "@/types";
+import { getWalletOverview, getTransactions } from "@/fetchData";
 
 const TRANSACTIONS_PER_PAGE = 15;
 
@@ -201,5 +201,8 @@ async function WalletOverviewWrapper({
     blockchainSymbol,
     address
   );
+  if (!walletOverview) {
+    return null; // or you can return a fallback UI
+  }
   return <>{render(walletOverview)}</>;
 }
