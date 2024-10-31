@@ -1,12 +1,12 @@
 import axios from 'axios';
-import Rand from 'rand-seed';
 import { BlockchainSymbol } from "./types";
 
 const API_URL = 'https://graphql.bitquery.io/';
-const API_KEY = 'BQYPukAzSxvupCs722VUSymBjMiNEuWP';
+const API_KEY = 'BQYdkG2CjnW4F516QkNkWLNv5QqNiFIo';
 
 let success = 0;
 let fail = 0;
+let progress = 0;
 
 const headers = {
   'Content-Type': 'application/json',
@@ -18,11 +18,36 @@ function getRiskScore() {
   else return 0;
 }
 
+export async function getBlock(height: number, coin: string) {
+  const blockQuery = `
+{
+  ethereum(network: ${coin}) {
+    blocks(
+      height: {is: ${height}}
+    ) {
+      height
+      hash
+    }
+  }
+}`
+  try {
+    const response = await axios.post(API_URL, { query: blockQuery }, { headers });
+    if (response.status !== 200) {
+      return 0;
+    }
+    return 1;
+  } catch (error) {
+    console.error('Error fetching block:', error);
+    return 0;
+  }
+}
+
 export async function getTransactions(
   initcoin: BlockchainSymbol,
   address: string, sortOrder: 'time' | 'amount',
   start: number,
-  end: number
+  end: number,
+  setProgress: (progress: number) => void
 ) {
   if (!address.startsWith('0x')) {
     return [];
@@ -86,13 +111,17 @@ export async function getTransactions(
     success = 0;
     fail = 0;
     
-    const allTransactions = [...toTransactions, ...fromTransactions].map((tx: any) => {
+    const allTransactions = await Promise.all([...toTransactions, ...fromTransactions].map(async (tx: any, index: number) => {
       if(tx.success === true){
         success++;
       } else {
         fail++;
       }
-    
+      if (await getBlock(tx.block.height, coin) === 1) {
+        progress = Math.max(((index + 1) / (toTransactions.length + fromTransactions.length))*100, progress);
+        setProgress(progress);
+      }
+      
       return {
         sender: tx.sender.address,
         receiver: tx.to.address,
@@ -104,7 +133,7 @@ export async function getTransactions(
         blockNumber: tx.block.height,
         timestamp: new Date(tx.block.timestamp.unixtime),
       };
-    });
+    }));
 
     allTransactions.sort((a, b) => {
       if (sortOrder === "time") {

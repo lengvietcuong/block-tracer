@@ -14,6 +14,12 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      keyframes: {
+        scale: {
+          '0%, 100%': { transform: 'scale(1.4)' },
+          '50%': { transform: 'scale(1.8)' },
+        },
+      },
       fontFamily: {
         geist: "var(--font-geist)",
         geistMono: "var(--font-geist-mono)",
