@@ -29,14 +29,17 @@ export async function getTransactions(
   }
 
   const coin = COINS[blockchainSymbol];
-  const limit = Math.floor((end - start + 1) / 2);
+  const limit = end - start + 1;
   const orderBy =
     sortOrder === "time" ? 'asc: "block.height"' : 'desc: "amount"';
-  const buildQuery = (direction: "txTo" | "txSender") => `
+  const query = `
     {
       ethereum(network: ${coin}) {
         transactions(
-          ${direction}: {is: "${address}"},
+          any: [
+            {txTo: {is: "${address}"}},
+            {txSender: {is: "${address}"}}
+          ]
           options: {
             limit: ${limit},
             offset: ${start},
@@ -55,16 +58,9 @@ export async function getTransactions(
       }
     }`;
 
-  const [toResponse, fromResponse] = await Promise.all([
-    axios.post(URL, { query: buildQuery("txTo") }, { headers }),
-    axios.post(URL, { query: buildQuery("txSender") }, { headers }),
-  ]);
-
-  const transactions = [
-    ...toResponse.data.data.ethereum.transactions,
-    ...fromResponse.data.data.ethereum.transactions,
-  ];
-    transactions.sort((a: any, b: any) => {
+  const response = await axios.post(URL, { query }, { headers });
+  const transactions = [...response.data.data.ethereum.transactions];
+  transactions.sort((a: any, b: any) => {
     if (sortOrder === "time") {
       return a.block.timestamp.unixtime - b.block.timestamp.unixtime;
     } else {
@@ -120,6 +116,5 @@ export async function getWalletOverview(
     received: Number(walletDetails.receiveFromCount),
     firstActive: new Date(walletDetails.firstTransferAt.unixtime * 1000),
     lastActive: new Date(walletDetails.lastTransferAt.unixtime * 1000),
-    riskScore: Math.round(Math.random() * 100),
   };
 }

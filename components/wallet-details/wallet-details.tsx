@@ -187,7 +187,6 @@ interface WalletOverviewWrapperProps {
     amountReceived: number;
     firstActive: Date;
     lastActive: Date;
-    riskScore: number;
   }) => React.ReactNode;
 }
 

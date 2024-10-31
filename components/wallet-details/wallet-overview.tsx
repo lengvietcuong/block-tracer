@@ -8,7 +8,6 @@ import { PiClockUserBold as LastActiveIcon } from "react-icons/pi";
 import { FiPlusCircle as PlusIcon } from "react-icons/fi";
 import { FiMinusCircle as MinusIcon } from "react-icons/fi";
 import { GrDocumentText as TransactionIcon } from "react-icons/gr";
-import { HiOutlineInformationCircle as InfoIcon } from "react-icons/hi";
 import { BLOCKCHAIN_NAMES } from "@/constants";
 import { convertToUsd, getTimeAgo, formatAmount } from "@/utils";
 import { format } from "date-fns"
@@ -25,30 +24,7 @@ interface WalletOverviewProps {
   amountReceived: number;
   firstActive: Date;
   lastActive: Date;
-  riskScore: number;
 }
-
-function getVerdict(riskScore: number) {
-  let title, description;
-  if (riskScore <= 25) {
-    title = "Safe";
-    description = "No suspicious activity detected.";
-  } else if (riskScore <= 50) {
-    title = "Uncertain";
-    description = "This wallet is somewhat suspicious.";
-  } else {
-    title = "Danger";
-    description = "Suspicious activities detected.";
-  }
-
-  return { title, description };
-}
-
-const RISK_COLOR = {
-  Safe: "bg-primary/15 border-primary",
-  Uncertain: "bg-muted border-muted-foreground",
-  Danger: "bg-destructive/15 border-destructive",
-};
 
 export default function WalletOverview({
   className,
@@ -61,7 +37,6 @@ export default function WalletOverview({
   amountReceived,
   firstActive,
   lastActive,
-  riskScore,
 }: WalletOverviewProps) {
   // Get the full blockchain name from its symbol (e.g. "eth" -> "Ethereum")
   const blockchainName = BLOCKCHAIN_NAMES[blockchainSymbol];
@@ -73,8 +48,6 @@ export default function WalletOverview({
 
   const firstActiveFormatted = format(firstActive, "MMM d, yyyy");
   const lastActiveFormatted = format(lastActive, "MMM d, yyyy");
-
-  const verdict = getVerdict(riskScore);
 
   return (
     <div className={cn("space-y-8", className)}>
@@ -196,37 +169,6 @@ export default function WalletOverview({
           <p className="mt-1 text-muted-foreground text-sm">
             {getTimeAgo(lastActive)}
           </p>
-        </div>
-      </div>
-
-      {/* Render the risk score */}
-      <div>
-        <div className="flex items-center mb-1.5">
-          <InfoIcon className="text-primary mr-1.5" />
-          <span className="text-sm text-muted-foreground font-medium mr-3">
-            Risk score
-          </span>
-        </div>
-        <div className="mt-3 flex gap-6">
-          <div
-            className={`rounded-full size-20 text-3xl grid place-items-center border-2 flex-shrink-0 ${
-              RISK_COLOR[verdict.title as "Safe" | "Uncertain" | "Danger"]
-            }`}
-          >
-            {riskScore}
-          </div>
-          <div>
-            <p
-              className={`font-bold text-lg ${
-                verdict.title === "Danger" ? "text-destructive" : ""
-              }`}
-            >
-              {verdict.title}
-            </p>
-            <p className="mt-0.5 text-muted-foreground">
-              {verdict.description}
-            </p>
-          </div>
         </div>
       </div>
     </div>
