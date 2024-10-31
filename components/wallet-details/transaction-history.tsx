@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import CopyButton from "@/components/wallet-details/copy-button";
 import { PiArrowElbowDownRightBold as DownRightArrowIcon } from "react-icons/pi";
-import { convertToUsd } from "@/utils";
+import { convertToUsd, formatAmount } from "@/utils";
 import { Transaction, BlockchainSymbol } from "@/types";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -30,9 +30,7 @@ export default function TransactionHistory({
     <Table className={cn("table-fixed", className)}>
       <TableHeader>
         <TableRow>
-          <TableHead className="text-primary font-bold w-[25%]">
-            ID
-          </TableHead>
+          <TableHead className="text-primary font-bold w-[25%]">ID</TableHead>
           <TableHead className="text-primary font-bold w-[40%]">
             Sender-Receiver
           </TableHead>
@@ -54,7 +52,7 @@ export default function TransactionHistory({
                 <CopyButton content={transaction.id} />
               </div>
             </TableCell>
-            
+
             {/* Sender and receiver attributes */}
             <TableCell>
               <div className="flex items-center gap-2">
@@ -90,8 +88,17 @@ export default function TransactionHistory({
             <TableCell
               title={`${transaction.amount} ${blockchainSymbol.toUpperCase()}`}
             >
-              <p>{transaction.amount} {blockchainSymbol.toUpperCase()}</p>
-              <p className="text-muted-foreground text-xs hidden md:block">~ ${convertToUsd(transaction.amount, blockchainSymbol)} USD</p>
+              <p>
+                {formatAmount(transaction.amount)}{" "}
+                {blockchainSymbol.toUpperCase()}
+              </p>
+              <p className="text-muted-foreground text-xs hidden md:block">
+                ~ $
+                {formatAmount(
+                  convertToUsd(transaction.amount, blockchainSymbol)
+                )}{" "}
+                USD
+              </p>
             </TableCell>
             <TableCell>
               {format(transaction.timestamp.getTime(), "hh:mmaaa dd/MM/yyyy")}

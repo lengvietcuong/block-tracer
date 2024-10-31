@@ -1,4 +1,4 @@
-import { Suspense, cache, useEffect, useState } from "react";
+import { Suspense, cache } from "react";
 import WalletOverview from "@/components/wallet-details/wallet-overview";
 import TransactionGraph from "@/components/wallet-details/transaction-graph";
 import TransactionHistory from "@/components/wallet-details/transaction-history";
@@ -11,16 +11,15 @@ import {
   PagesSkeleton,
 } from "@/components/wallet-details/skeletons";
 import { BlockchainSymbol, Transaction } from "@/types";
-import { getWalletOverview, getTransactions } from "@/fetchData";
+import { getWalletOverview, getTransactions } from "@/bitQuery";
 
-const TRANSACTIONS_PER_PAGE = 15;
+const TRANSACTIONS_PER_PAGE = 16;
 
 interface WalletDetailsProps {
   blockchainSymbol: BlockchainSymbol;
   address: string;
   sortOrder: "time" | "amount";
   currentPage: number;
-  setProgress: (progress: number) => void;
 }
 
 export default function WalletDetails({
@@ -28,7 +27,6 @@ export default function WalletDetails({
   address,
   sortOrder,
   currentPage,
-  setProgress,
 }: WalletDetailsProps) {
   // This component uses Suspense boundaries to separate dynamic elements from static ones
   // The static components are rendered immediately
@@ -60,7 +58,6 @@ export default function WalletDetails({
                     transactions={transactions}
                   />
                 )}
-                setProgress={setProgress}
               />
             </Suspense>
           </div>
@@ -105,7 +102,6 @@ export default function WalletDetails({
               transactions={transactions}
             />
           )}
-          setProgress={setProgress}
         />
       </Suspense>
 
@@ -134,30 +130,6 @@ export default function WalletDetails({
     </>
   );
 }
-// Simple cache object to store promises and data
-const caches = new Map<string, any>();
-
-function useSuspendedData<T>(key: string, fetchData: () => Promise<T>): T {
-  // Check if data or promise exists in the cache
-  if (!caches.has(key)) {
-    // Store the promise in the cache
-    const promise = fetchData()
-      .then((data) => {
-        caches.set(key, { data });  // Store resolved data in cache
-        return data;
-      })
-      .catch((error) => {
-        caches.delete(key);  // Remove from cache on error
-        throw error;
-      });
-    caches.set(key, { promise });
-    throw promise;  // Throw promise for Suspense to catch
-  }
-
-  const cached = caches.get(key);
-  if (cached.data) return cached.data;  // Return data if available
-  throw cached.promise;  // Otherwise, throw promise for Suspense
-}
 
 // Because there are multiple components that need access to the same data, caching is used to prevent redundant API calls
 // The cache is cleared when the user refreshes the page
@@ -172,8 +144,7 @@ const getCachedTransactions = cache(
     sortOrder: "time" | "amount",
     start: number,
     end: number,
-    setProgress: (progress: number) => void
-  ) => getTransactions(blockchainSymbol, address, sortOrder, start, end, setProgress)
+  ) => getTransactions(blockchainSymbol, address, sortOrder, start, end)
 );
 
 // The transaction wrapper provides the fetched transaction data to its child components
@@ -183,34 +154,24 @@ interface TransactionsWrapperProps {
   sortOrder: "time" | "amount";
   currentPage: number;
   render: (transactions: Transaction[]) => React.ReactNode;
-  setProgress: (progress: number) => void;
 }
 
-function TransactionsWrapper({
+async function TransactionsWrapper({
   blockchainSymbol,
   address,
   sortOrder,
   currentPage,
   render,
-  setProgress,
 }: TransactionsWrapperProps) {
-  const fetchTransactions = async () => {
-    const start = (currentPage - 1) * TRANSACTIONS_PER_PAGE;
-    const end = currentPage * TRANSACTIONS_PER_PAGE - 1;
-    return await getCachedTransactions(
-      blockchainSymbol,
-      address,
-      sortOrder,
-      start,
-      end,
-      setProgress
-    );
-  };
-  const transactions = useSuspendedData(
-    `transactions-${blockchainSymbol}-${address}-${currentPage}`,
-    fetchTransactions
+  const start = (currentPage - 1) * TRANSACTIONS_PER_PAGE;
+  const end = currentPage * TRANSACTIONS_PER_PAGE - 1;
+  const transactions = await getCachedTransactions(
+    blockchainSymbol,
+    address,
+    sortOrder,
+    start,
+    end
   );
-
   return <>{render(transactions)}</>;
 }
 
@@ -230,19 +191,14 @@ interface WalletOverviewWrapperProps {
   }) => React.ReactNode;
 }
 
-function WalletOverviewWrapper({
+async function WalletOverviewWrapper({
   blockchainSymbol,
   address,
   render,
 }: WalletOverviewWrapperProps) {
-  const fetchWalletOverview = async () => {
-    return await getCachedWalletOverview(blockchainSymbol, address);
-  };
-
-  const walletOverview = useSuspendedData(
-    `walletOverview-${blockchainSymbol}-${address}`,
-    fetchWalletOverview
+  const walletOverview = await getCachedWalletOverview(
+    blockchainSymbol,
+    address
   );
-
-  return walletOverview ? <>{render(walletOverview)}</> : null;
+  return <>{render(walletOverview)}</>;
 }

@@ -30,3 +30,7 @@ export function getTimeAgo(date: Date) {
   }
   return "";
 }
+
+export function formatAmount(amount: number) {
+  return parseFloat(amount.toFixed(5)).toLocaleString();
+}

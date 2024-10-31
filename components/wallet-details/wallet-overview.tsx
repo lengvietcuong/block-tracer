@@ -10,7 +10,7 @@ import { FiMinusCircle as MinusIcon } from "react-icons/fi";
 import { GrDocumentText as TransactionIcon } from "react-icons/gr";
 import { HiOutlineInformationCircle as InfoIcon } from "react-icons/hi";
 import { BLOCKCHAIN_NAMES } from "@/constants";
-import { convertToUsd, getTimeAgo } from "@/utils";
+import { convertToUsd, getTimeAgo, formatAmount } from "@/utils";
 import { format } from "date-fns"
 import { cn } from "@/lib/utils";
 
@@ -103,7 +103,7 @@ export default function WalletOverview({
             </span>
           </div>
           <p className="text-2xl font-semibold">
-            {balance} {blockchainSymbol.toUpperCase()}
+            {formatAmount(balance)} {blockchainSymbol.toUpperCase()}
           </p>
           <p className="mt-1 text-muted-foreground text-sm">
             ~ ${balanceUsdValue.toLocaleString()} USD
@@ -120,17 +120,17 @@ export default function WalletOverview({
           </div>
           <div className="flex gap-4 text-center">
             <div className="space-y-1">
-              <p className="text-2xl">{sent}</p>
+              <p className="text-2xl">{formatAmount(sent)}</p>
               <p className="text-sm text-muted-foreground">Sent</p>
             </div>
             <div className="border-l self-stretch bg-muted" />
             <div className="space-y-1">
-              <p className="text-2xl">{received}</p>
+              <p className="text-2xl">{formatAmount(received)}</p>
               <p className="text-sm text-muted-foreground">Received</p>
             </div>
             <div className="border-l self-stretch bg-muted" />
             <div className="space-y-1">
-              <p className="text-2xl">{sent + received}</p>
+              <p className="text-2xl">{formatAmount(sent + received)}</p>
               <p className="text-sm text-muted-foreground">Total</p>
             </div>
           </div>
@@ -147,7 +147,7 @@ export default function WalletOverview({
             </span>
           </div>
           <p className="text-2xl font-semibold">
-            {amountSent} {blockchainSymbol.toUpperCase()}
+            {formatAmount(amountSent)} {blockchainSymbol.toUpperCase()}
           </p>
           <p className="mt-1 text-muted-foreground text-sm">
             ~ ${sentUsdValue.toLocaleString()} USD
@@ -162,7 +162,7 @@ export default function WalletOverview({
             </span>
           </div>
           <p className="text-2xl font-semibold">
-            {amountReceived} {blockchainSymbol.toUpperCase()}
+            {formatAmount(amountReceived)} {blockchainSymbol.toUpperCase()}
           </p>
           <p className="mt-1 text-muted-foreground text-sm">
             ~ ${receivedUsdValue.toLocaleString()} USD

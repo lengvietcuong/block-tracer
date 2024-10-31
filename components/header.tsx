@@ -1,7 +1,6 @@
 import HeaderWrapper from "./header-wrapper";
 import Logo from "@/components/icons/logo";
 import Link from "next/link";
-import PWAINstallButton from "./PWA_install_button";
 
 export default function Header({
   changeStyleOnScroll,
