@@ -66,7 +66,7 @@ export async function getTransactions(
   ];
     transactions.sort((a: any, b: any) => {
     if (sortOrder === "time") {
-      return a.timestamp.getTime() - b.timestamp.getTime();
+      return a.block.timestamp.unixtime - b.block.timestamp.unixtime;
     } else {
       return b.amount - a.amount;
     }
