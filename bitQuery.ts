@@ -31,7 +31,7 @@ export async function getTransactions(
   const coin = COINS[blockchainSymbol];
   const limit = end - start + 1;
   const orderBy =
-    sortOrder === "time" ? 'asc: "block.height"' : 'desc: "amount"';
+    sortOrder === "time" ? 'desc: "block.timestamp.unixtime"' : 'desc: "amount"';
   const query = `
     {
       ethereum(network: ${coin}) {
@@ -60,13 +60,6 @@ export async function getTransactions(
 
   const response = await axios.post(URL, { query }, { headers });
   const transactions = [...response.data.data.ethereum.transactions];
-  transactions.sort((a: any, b: any) => {
-    if (sortOrder === "time") {
-      return a.block.timestamp.unixtime - b.block.timestamp.unixtime;
-    } else {
-      return b.amount - a.amount;
-    }
-  });
 
   return transactions.map((tx: any) => ({
     id: tx.hash,
