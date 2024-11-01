@@ -65,7 +65,7 @@ export async function getTransactions(
     id: tx.hash,
     sender: tx.sender.address,
     receiver: tx.to.address,
-    amount: parseFloat(tx.amount),
+    amount: Number(tx.amount),
     blockNumber: tx.block.height,
     timestamp: new Date(tx.block.timestamp.unixtime * 1000),
   }));
@@ -85,13 +85,10 @@ export async function getWalletOverview(
       addressStats(address: {is: "${address}"}) {
         address {
           balance
-          callTxCount
-          receiveAmount
           sendAmount
-          sendToCount
-          receiveFromCount
-          receiveTxCount
+          receiveAmount
           sendTxCount
+          receiveTxCount
           firstTransferAt { unixtime }
           lastTransferAt { unixtime }
         }
@@ -101,12 +98,13 @@ export async function getWalletOverview(
 
   const response = await axios.post(URL, { query }, { headers });
   const walletDetails = response.data.data.ethereum.addressStats[0].address;
+
   return {
-    balance: Number(walletDetails.balance),
+    balance: Math.abs(Number(walletDetails.balance)),
     amountReceived: Number(walletDetails.receiveAmount),
     amountSent: Number(walletDetails.sendAmount),
-    sent: Number(walletDetails.sendToCount),
-    received: Number(walletDetails.receiveFromCount),
+    sent: Number(walletDetails.sendTxCount),
+    received: Number(walletDetails.receiveTxCount),
     firstActive: new Date(walletDetails.firstTransferAt.unixtime * 1000),
     lastActive: new Date(walletDetails.lastTransferAt.unixtime * 1000),
   };
