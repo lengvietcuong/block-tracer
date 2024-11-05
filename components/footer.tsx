@@ -9,6 +9,7 @@ import { FaXTwitter as TwitterIcon } from "react-icons/fa6";
 import { FaTiktok as TikTokIcon } from "react-icons/fa";
 import { IconType } from "react-icons";
 
+// Type definitions for social network and contact item properties
 interface SocialNetworkProps {
   Icon: IconType;
   name: string;
@@ -21,7 +22,7 @@ interface ContactItemProps {
 }
 
 function SocialNetwork({ Icon, name }: SocialNetworkProps) {
-  // Renders the logo of the social network that is hyperlinked to its homepage
+  // Renders a social network icon with a hyperlink to the respective homepage
   return (
     <li>
       <a
@@ -37,7 +38,7 @@ function SocialNetwork({ Icon, name }: SocialNetworkProps) {
 }
 
 function ContactItem({ Icon, text, href }: ContactItemProps) {
-  // Renders a contact item with an icon and text that is hyperlinked
+  // Renders a contact item (e.g., email, phone, location) as an icon with text and a hyperlink
   return (
     <a
       className="flex items-center text-sm text-muted-foreground hover:text-foreground"
@@ -56,12 +57,13 @@ export default function Footer() {
     <footer className="border-t bg-background px-6 py-8 md:px-8 lg:px-12 xl:px-28">
       <div className="mx-auto max-w-screen-2xl">
         <div className="flex flex-col gap-6 md:flex-row md:justify-between">
-          <div className="flex flex-col lg:flex-row justify-center gap-6 lg:gap-8">
+          {/* Left section with logo and contact details */}
+          <div className="flex flex-col justify-center gap-6 lg:flex-row lg:gap-8">
             <div className="flex items-center gap-3">
-              <Logo className="size-8 lg:size-12 fill-primary" />
-              <p className="lg:hidden font-bold">Block Tracer</p>
+              <Logo className="size-8 fill-primary lg:size-12" />
+              <p className="font-bold lg:hidden">Block Tracer</p>
             </div>
-            <div className="space-y-3 max-w-sm">
+            <div className="max-w-sm space-y-3">
               <ContactItem
                 Icon={EmailIcon}
                 text="support@blocktracer.com"
@@ -79,7 +81,10 @@ export default function Footer() {
               />
             </div>
           </div>
+
           <hr className="md:hidden" />
+          
+          {/* Right section with social network icons */}
           <div className="flex justify-center gap-8 md:gap-12">
             <ul className="flex justify-center gap-8 md:gap-12">
               <SocialNetwork Icon={FacebookIcon} name="Facebook" />
@@ -90,6 +95,7 @@ export default function Footer() {
             </ul>
           </div>
         </div>
+        {/* Footer text with copyright information */}
         <p className="mt-4 text-center text-sm text-muted-foreground">
           © 2024 Block Tracer
         </p>

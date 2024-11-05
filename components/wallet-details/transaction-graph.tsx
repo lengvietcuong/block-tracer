@@ -2,21 +2,15 @@
 
 import { useState, useRef, useMemo } from "react";
 import Link from "next/link";
-import { Transaction, Node, BlockchainSymbol } from "@/types";
-
-function abbreviateAddress(address: string) {
-  if (address.length <= 8) {
-    return address; // If the address is short enough, no need to abbreviate
-  }
-  // Shorten the address: keep the first 4 and last 4 characters, with "..." in the middle
-  return `${address.slice(0, 4)}...${address.slice(-4)}`;
-}
+import { TransactionPartial, Node, BlockchainSymbol } from "@/types";
+import { abbreviateAddress } from "@/utils";
+import TransactionDialog from "@/components/wallet-details/transaction-dialog";
 
 interface TransactionGraphProps {
   className?: string;
   blockchainSymbol: BlockchainSymbol;
   address: string;
-  transactions: Transaction[];
+  transactions: TransactionPartial[];
 }
 
 // Constants for the dimensions of the graph
@@ -24,7 +18,7 @@ const SIDE_LENGTH = 600;
 const CENTER = SIDE_LENGTH / 2;
 const RADIUS = SIDE_LENGTH / 2.5;
 const MIN_NODE_RADIUS = 16;
-const MAX_NODE_RADIUS = 40;
+const MAX_NODE_RADIUS = 36;
 const ARROW_LENGTH = 12;
 const ARROW_WIDTH = 6;
 
@@ -36,11 +30,14 @@ export default function TransactionGraph({
 }: TransactionGraphProps) {
   const [hoveredEdge, setHoveredEdge] = useState<string | null>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<TransactionPartial | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Calculate node positions and sizes based on transactions
   const { nodes } = useMemo(() => {
-    const amounts = transactions.map((transaction) => transaction.amount);
+    const amounts = transactions.map((transaction) => transaction.value);
     const minAmount = Math.min(...amounts);
     const maxAmount = Math.max(...amounts);
 
@@ -51,19 +48,21 @@ export default function TransactionGraph({
       // Normalize the transaction amount to determine the node size
       // The node corresponding to the minimum amount will have the smallest radius and vice versa
       const normalizedAmount =
-        (transaction.amount - minAmount) / (maxAmount - minAmount);
+        maxAmount === minAmount
+          ? 0.5
+          : (transaction.value - minAmount) / (maxAmount - minAmount);
       const nodeRadius =
         MIN_NODE_RADIUS +
         normalizedAmount * (MAX_NODE_RADIUS - MIN_NODE_RADIUS);
 
       return {
-        id: transaction.id,
+        id: transaction.hash,
         address:
-          transaction.sender === address // Get the address of the "other" node (not the one searched for)
-            ? transaction.receiver
-            : transaction.sender,
-        x: CENTER + RADIUS * Math.cos(angle), // Trigonometry
-        y: CENTER + RADIUS * Math.sin(angle), // Trigonometry
+          transaction.fromAddress === address
+            ? transaction.toAddress
+            : transaction.fromAddress,
+        x: CENTER + RADIUS * Math.cos(angle),
+        y: CENTER + RADIUS * Math.sin(angle),
         radius: nodeRadius,
       };
     });
@@ -71,11 +70,13 @@ export default function TransactionGraph({
     return { nodes, minAmount, maxAmount };
   }, [transactions, address]);
 
-  function renderEdge(transaction: Transaction, node: Node) {
-    // Determine where the edge's direction
-    // If the searched wallet is the sender, the edge starts from the center and points to the node
-    // Otherwise, the edge starts from the node and points to the center
-    const isSearchedWalletSender = transaction.sender === address;
+  function handleEdgeClick(transaction: TransactionPartial) {
+    setSelectedTransaction(transaction);
+    setIsDialogOpen(true);
+  }
+
+  function renderEdge(transaction: TransactionPartial, node: Node) {
+    const isSearchedWalletSender = transaction.fromAddress === address;
     const start = isSearchedWalletSender ? { x: CENTER, y: CENTER } : node;
     const end = isSearchedWalletSender ? node : { x: CENTER, y: CENTER };
 
@@ -106,20 +107,25 @@ export default function TransactionGraph({
     const arrowPoint2X = endX - ARROW_LENGTH * arrowDx - ARROW_WIDTH * arrowDy;
     const arrowPoint2Y = endY - ARROW_LENGTH * arrowDy + ARROW_WIDTH * arrowDx;
 
-    const edgeId = `edge-${transaction.id}`;
+    const edgeId = `edge-${transaction.hash}`;
     const isHovered = hoveredEdge === edgeId;
 
     // Determine the sign of the transaction amount (positive for received, negative for sent)
     const sign = isSearchedWalletSender ? "-" : "+";
-    const amount = `${sign}${transaction.amount.toFixed(
-      2
-    )} ${blockchainSymbol.toUpperCase()}`; // Display the transaction amount with the blockchain symbol
+    const amount = `${sign}${transaction.value.toFixed(
+      2,
+    )} ${blockchainSymbol.toUpperCase()}`;
 
     return (
       <g
         key={edgeId}
         onMouseEnter={() => setHoveredEdge(edgeId)}
         onMouseLeave={() => setHoveredEdge(null)}
+        onClick={(e) => {
+          e.preventDefault(); // Prevent any parent Link components from triggering
+          handleEdgeClick(transaction);
+        }}
+        className="cursor-pointer"
       >
         {/* Invisible line to increase the hitbox of the edge to make hovering easier */}
         <line
@@ -157,10 +163,10 @@ export default function TransactionGraph({
         >
           {/* Render a rectangle as the background for the edge label */}
           <rect
-            width={isHovered ? 100 : 75}
-            height={isHovered ? 30 : 22.5}
-            x={isHovered ? -50 : -37.5}
-            y={isHovered ? -15 : -11.25}
+            width={isHovered ? 100 : 50}
+            height={isHovered ? 30 : 15}
+            x={isHovered ? -50 : -25}
+            y={isHovered ? -15 : -7.5}
             rx={4}
             className={isHovered ? "fill-muted" : "fill-background"}
           />
@@ -170,8 +176,8 @@ export default function TransactionGraph({
             dy={isHovered ? 5 : 4}
             className={
               isHovered
-                ? "fill-primary font-bold text-base"
-                : "fill-muted-foreground text-xs"
+                ? "fill-primary text-base font-bold"
+                : "fill-muted-foreground text-[10px]"
             }
           >
             {amount}
@@ -200,7 +206,7 @@ export default function TransactionGraph({
             r={node.radius}
             className={
               hoveredNode === node.id
-                ? "stroke-primary stroke-2 fill-primary/15"
+                ? "fill-primary/15 stroke-primary stroke-2"
                 : "stroke-muted-foreground"
             }
           />
@@ -209,57 +215,68 @@ export default function TransactionGraph({
             x={node.x}
             y={node.y - node.radius - 8}
             textAnchor="middle"
-            className="text-xs fill-foreground"
+            className="fill-foreground text-xs"
           >
             {abbreviateAddress(node.address)}
           </text>
-          <title>{node.address}</title> {/* Tooltip with full address */}
+          <title>{node.address}</title>
         </g>
       </Link>
     );
   }
 
   return (
-    <div ref={containerRef} className={className}>
-      <svg
-        width="100%"
-        height="100%"
-        viewBox={`0 0 ${SIDE_LENGTH} ${SIDE_LENGTH}`}
-      >
-        {/* Render all transaction edges */}
-        {transactions.map((transaction, index) =>
-          renderEdge(transaction, nodes[index])
-        )}
-
-        {/* Render the hovered edge on top */}
-        {hoveredEdge &&
-          transactions.map(
-            (transaction, index) =>
-              hoveredEdge === `edge-${transaction.id}` &&
-              renderEdge(transaction, nodes[index])
+    <>
+      <div ref={containerRef} className={className}>
+        <svg
+          width="100%"
+          height="100%"
+          viewBox={`0 0 ${SIDE_LENGTH} ${SIDE_LENGTH}`}
+        >
+          {/* Render edges between the searched wallet and other wallets */}
+          {transactions.map((transaction, index) =>
+            renderEdge(transaction, nodes[index]),
           )}
 
-        {/* Central node for the searched wallet */}
-        <g>
-          <circle
-            cx={CENTER}
-            cy={CENTER}
-            r={MAX_NODE_RADIUS}
-            className="fill-primary"
-          />
-          <text
-            x={CENTER}
-            y={CENTER - MAX_NODE_RADIUS - 8}
-            textAnchor="middle"
-            className="text-xs fill-foreground"
-          >
-            {abbreviateAddress(address)}
-          </text>
-        </g>
+          {/* Render the hovered edge on top */}
+          {hoveredEdge &&
+            transactions.map(
+              (transaction, index) =>
+                hoveredEdge === `edge-${transaction.hash}` &&
+                renderEdge(transaction, nodes[index]),
+            )}
 
-        {/* Render nodes for other wallets involved in transactions */}
-        {nodes.map(renderNode)}
-      </svg>
-    </div>
+          {/* Central node for the searched wallet */}
+          <g>
+            <circle
+              cx={CENTER}
+              cy={CENTER}
+              r={MAX_NODE_RADIUS}
+              className="fill-primary"
+            />
+            <text
+              x={CENTER}
+              y={CENTER - MAX_NODE_RADIUS - 8}
+              textAnchor="middle"
+              className="fill-foreground text-xs"
+            >
+              {abbreviateAddress(address)}
+            </text>
+          </g>
+
+          {/* Render nodes for other wallets involved in transactions */}
+          {nodes.map(renderNode)}
+        </svg>
+      </div>
+
+      {selectedTransaction && (
+        <TransactionDialog
+          isOpen={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          transaction={selectedTransaction}
+          blockchainSymbol={blockchainSymbol}
+        />
+      )}
+    </>
   );
 }

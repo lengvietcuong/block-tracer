@@ -38,16 +38,16 @@ function BrainNode({ data }: NodeProps) {
   return (
     <div className="relative size-8 lg:size-6" title={data.label}>
       {/* Place the input and output handles in the center of the node */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
         <Handle type="source" position={Position.Left} className="invisible" />
       </div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
         <Handle type="target" position={Position.Left} className="invisible" />
       </div>
 
       {/* If the node is selected (indicating a criminal), render it in red; otherwise, render it in green */}
       <div
-        className={`grid place-items-center size-full rounded-full border ${
+        className={`grid size-full place-items-center rounded-full border ${
           data.selected ? "border-destructive/50" : "border-primary/50"
         } bg-background`}
       >
@@ -63,7 +63,7 @@ function BrainNode({ data }: NodeProps) {
 
 export default function BrainGraph({ className }: { className?: string }) {
   const initialNodes: Node[] = brainPolygon.map((point, index) =>
-    createNode(index + 1, point.x, point.y, point.selected)
+    createNode(index + 1, point.x, point.y, point.selected),
   );
 
   // Generate random connections between the nodes

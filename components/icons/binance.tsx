@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 
 const Binance = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -29,5 +29,5 @@ const Binance = (props: React.SVGProps<SVGSVGElement>) => (
       </g>
     </g>
   </svg>
-)
-export default Binance
+);
+export default Binance;

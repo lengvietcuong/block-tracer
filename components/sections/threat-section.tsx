@@ -9,20 +9,20 @@ export default function ThreatSection() {
         The threat is{" "}
         <span className="font-bold text-destructive">unprecedented</span>
       </h2>
-      <p className="mt-2 md:mt-3 text-center text-muted-foreground text-sm">
+      <p className="mt-2 text-center text-sm text-muted-foreground md:mt-3">
         Source:{" "}
         <a
           href="https://www.ic3.gov/Media/PDF/AnnualReport/2023_IC3CryptocurrencyReport.pdf"
           target="_blank"
-          className="hover:underline underline-offset-4 peer hover:text-foreground transition-colors"
+          className="peer underline-offset-4 transition-colors hover:text-foreground hover:underline"
         >
           FBI
         </a>
-        <UpRightArrowIcon className="inline-block ml-1 peer peer-hover:fill-foreground transition-colors" />
+        <UpRightArrowIcon className="peer ml-1 inline-block transition-colors peer-hover:fill-foreground" />
       </p>
-      <div className="flex flex-col lg:flex-row mt-6 md:mt-9 lg:mt-12 gap-8 md:gap-10 lg:gap-20">
-        <div className="w-full lg:w-1/2 flex-shrink-0">
-          <h3 className="font-bold text-center text-lg md:text-xl lg:text-2xl">
+      <div className="mt-6 flex flex-col gap-8 md:mt-9 md:gap-10 lg:mt-12 lg:flex-row lg:gap-20">
+        <div className="w-full flex-shrink-0 lg:w-1/2">
+          <h3 className="text-center text-lg font-bold md:text-xl lg:text-2xl">
             Loss from crypto fraud
           </h3>
           <CrimeDataChart />
@@ -31,18 +31,16 @@ export default function ThreatSection() {
         <div className="lg:max-w-sm">
           <p className="text-muted-foreground">
             In 2023, the FBI received over{" "}
-            <span className="text-foreground font-bold">
-              69,000 complaints
-            </span>{" "}
+            <span className="font-bold text-foreground">69,000 complaints</span>{" "}
             from more than{" "}
-            <span className="text-foreground font-bold">200 countries</span>{" "}
+            <span className="font-bold text-foreground">200 countries</span>{" "}
             about crypto fraud, with losses exceeding{" "}
-            <span className="text-foreground font-bold">$5.6 billion</span>.
+            <span className="font-bold text-foreground">$5.6 billion</span>.
           </p>
           <br />
           <p className="text-muted-foreground">
             Being{" "}
-            <span className="text-foreground font-bold">
+            <span className="font-bold text-foreground">
               decentralized, fast, and irreversible
             </span>
             , cryptocurrencies attract criminals and make recovering stolen
@@ -50,7 +48,7 @@ export default function ThreatSection() {
           </p>
           <br />
           <p className="text-muted-foreground">
-            <span className="text-foreground font-bold">
+            <span className="font-bold text-foreground">
               Quick, accurate reporting is crucial
             </span>{" "}
             for investigation.

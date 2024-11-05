@@ -14,6 +14,7 @@ import Polygon from "@/components/icons/polygon";
 import Klaytn from "@/components/icons/klaytn";
 import Swincoin from "@/components/icons/swincoin";
 
+// Map of blockchain symbols to their respective icon components
 const BLOCKCHAIN_ICONS = {
   eth: Etherium,
   bnb: Binance,
@@ -25,8 +26,8 @@ const BLOCKCHAIN_ICONS = {
 
 interface BlockchainSelectionProps {
   className?: string;
-  blockchainSymbol: BlockchainSymbol;
-  setBlockchainSymbol: (blockchainSymbol: BlockchainSymbol) => void;
+  blockchainSymbol: BlockchainSymbol; // Current selected blockchain symbol
+  setBlockchainSymbol: (blockchainSymbol: BlockchainSymbol) => void; // Function to update selected blockchain
 }
 
 export default function BlockchainSelection({
@@ -34,6 +35,7 @@ export default function BlockchainSelection({
   blockchainSymbol,
   setBlockchainSymbol,
 }: BlockchainSelectionProps) {
+  // Helper function to render each blockchain item with its icon and symbol
   function renderBlockchain(symbol: BlockchainSymbol) {
     const Icon = BLOCKCHAIN_ICONS[symbol];
     return (
@@ -53,7 +55,7 @@ export default function BlockchainSelection({
       >
         <SelectValue placeholder="Blockchain" />
       </SelectTrigger>
-      {/* Render all the supported blockchains */}
+      {/* Render all supported blockchains in the dropdown */}
       <SelectContent side="bottom">
         {Object.keys(BLOCKCHAIN_NAMES).map((key) => (
           <SelectItem key={key} value={key}>

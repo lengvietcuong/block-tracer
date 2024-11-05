@@ -2,31 +2,33 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-export default function SortSelection({
-  className,
-  selected,
-}: {
+interface SortSelectionProps {
+  orderBy?: "time" | "amount";
   className?: string;
-  selected: "time" | "amount";
-}) {
+}
+
+export default function SortSelection({
+  orderBy = "time",
+  className,
+}: SortSelectionProps) {
   return (
     // Update the sort order by changing the query parameter in the URL
     // When the sort order is updated, the page number is implicitly reset to 1
-    <div className={cn("flex gap-2", className)}>
-      <Link href="?sort=time">
+    <div className={cn("flex gap-1", className)}>
+      <Link href={`?sort=time`} scroll={false}>
         <Button
           variant="ghost"
           size="sm"
-          className={`text-xs rounded-full px-3.5 h-8 ${selected === "time" ? "bg-muted" : ""}`}
+          className={`h-7 rounded-full px-4 text-xs ${orderBy === "time" ? "bg-muted" : ""}`}
         >
           Most recent
         </Button>
       </Link>
-      <Link href="?sort=amount">
+      <Link href={`?sort=amount`} scroll={false}>
         <Button
           variant="ghost"
           size="sm"
-          className={`text-xs rounded-full px-3.5 h-8 ${selected === "amount" ? "bg-muted" : ""}`}
+          className={`h-7 rounded-full px-4 text-xs ${orderBy === "amount" ? "bg-muted" : ""}`}
         >
           Most value
         </Button>

@@ -76,5 +76,5 @@ export default function CrimeDataChart() {
     },
   };
 
-  return <Bar data={chartData} options={options} height={200}/>;
+  return <Bar data={chartData} options={options} height={200} />;
 }

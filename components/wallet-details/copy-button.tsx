@@ -36,7 +36,7 @@ export default function CopyButton({ content }: { content: string }) {
             {copied ? (
               <CheckmarkIcon className="size-4" />
             ) : (
-              <CopyIcon className="size-4 fill-muted-foreground hover:fill-foreground transition-colors" />
+              <CopyIcon className="size-4 fill-muted-foreground transition-colors hover:fill-foreground" />
             )}
           </Button>
         </TooltipTrigger>

@@ -6,20 +6,23 @@ import BlockchainSelection from "./blockchain-selection";
 import { BlockchainSymbol } from "@/types";
 import { useRouter } from "next/navigation";
 import { IoSearch as SearchIcon } from "react-icons/io5";
-import Loading from "@/components/loading-section";
+import { ImSpinner10 as LoadingSpinner } from "react-icons/im";
+import BlockSearch from "@/components/icons/block-search";
 
 interface WalletSearchProps {
+  defaultBlockchain?: BlockchainSymbol;
   variant?: "full" | "compact";
   showLoading?: boolean;
 }
 
 export default function WalletSearch({
+  defaultBlockchain = "eth",
   variant = "full",
   showLoading = false,
 }: WalletSearchProps) {
   const [walletAddress, setWalletAddress] = useState("");
   const [blockchainSymbol, setBlockchainSymbol] =
-    useState<BlockchainSymbol>("eth");
+    useState<BlockchainSymbol>(defaultBlockchain);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -38,10 +41,11 @@ export default function WalletSearch({
     <>
       {loading && showLoading && (
         <>
-          <div className="fixed inset-0 z-20 grid place-items-center">
-            <Loading />
+          <div className="pointer-events-none fixed inset-0 z-10 bg-background/50 backdrop-blur-md"></div>
+          <div className="fixed left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2">
+            <LoadingSpinner className="size-32 animate-spin text-primary" />
           </div>
-          <div className="fixed inset-0 z-10 bg-background/75 pointer-events-none"></div>
+          <BlockSearch className="fixed left-1/2 top-1/2 z-20 size-16 -translate-x-1/2 -translate-y-1/2 fill-foreground" />
         </>
       )}
       <form
@@ -49,7 +53,7 @@ export default function WalletSearch({
         className={`flex items-center rounded-lg ${
           variant === "full"
             ? "bg-background shadow-[0_0_10px_3px_hsl(var(--muted-foreground)/0.5)] lg:shadow-[0_0_20px_5px_hsl(var(--muted-foreground)/0.5)]"
-            : "bg-secondary max-w-64 sm:max-w-none"
+            : "max-w-64 bg-secondary sm:max-w-none"
         }`}
         onSubmit={handleWalletSearch}
       >
@@ -68,9 +72,7 @@ export default function WalletSearch({
             value={walletAddress}
             onChange={(e) => setWalletAddress(e.target.value)}
             placeholder="Enter address"
-            className={`bg-transparent border-none pl-12
-            ${variant === "full" ? "h-12" : "h-10  text-xs"}
-          `}
+            className={`border-none bg-transparent pl-12 ${variant === "full" ? "h-12" : "h-10 text-xs"} `}
           />
         </div>
         <BlockchainSelection

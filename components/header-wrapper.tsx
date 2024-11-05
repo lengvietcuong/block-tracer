@@ -2,14 +2,17 @@
 
 import { useState, useEffect, ReactNode } from "react";
 import WalletSearch from "@/components/wallet-details/wallet-search";
+import { BlockchainSymbol } from "@/types";
 
 interface HeaderWrapperProps {
   children: ReactNode;
+  defaultBlockchain?: BlockchainSymbol;
   changeStyleOnScroll?: boolean;
 }
 
 function HeaderWrapper({
   children,
+  defaultBlockchain = "eth",
   changeStyleOnScroll = true,
 }: HeaderWrapperProps) {
   // Keep track of whether the user has scrolled down the page
@@ -30,16 +33,19 @@ function HeaderWrapper({
 
   return (
     <header
-      className={`sticky top-0 z-10 px-4 md:px-8 lg:px-12 xl:px-28 py-3 transition-colors duration-300 ${
+      className={`sticky top-0 z-10 px-4 py-3 transition-colors duration-300 md:px-8 lg:px-12 xl:px-28 ${
         scrolled || !changeStyleOnScroll
-          ? "bg-background border-b"
+          ? "border-b bg-background"
           : "bg-transparent"
       }`}
     >
-      <div className="flex items-center max-w-screen-2xl mx-auto justify-between">
+      <div className="mx-auto flex max-w-screen-2xl items-center justify-between">
         {children}
         {(scrolled || !changeStyleOnScroll) && (
-          <WalletSearch variant="compact" />
+          <WalletSearch
+            variant="compact"
+            defaultBlockchain={defaultBlockchain}
+          />
         )}
       </div>
     </header>
