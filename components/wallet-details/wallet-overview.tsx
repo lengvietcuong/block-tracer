@@ -34,6 +34,7 @@ export default async function WalletOverview({
     amountReceived,
     firstActive,
     lastActive,
+    contractType,
   } = await response.json();
 
   // Format the first and last active dates
@@ -44,6 +45,7 @@ export default async function WalletOverview({
 
   // Get the full blockchain name from its symbol (e.g. "eth" -> "Ethereum")
   const blockchainName = BLOCKCHAIN_NAMES[blockchainSymbol];
+  const contractTypeFormatted = contractType === "contract" ? "Contract" : "External Owned Account";
 
   // Convert from crypto to USD
   const balanceUsdValue = convertToUsd(balance, blockchainSymbol);
@@ -53,12 +55,13 @@ export default async function WalletOverview({
       <div className="w-fit space-y-6">
         {/* Wallet address with the copy button */}
         <div>
-          <div className="mb-1.5 flex items-center">
+          <div className="mb-1.5 flex items-center gap-x-2">
             <WalletIcon className="mr-1.5 text-primary" />
             <span className="mr-3 text-sm font-medium text-muted-foreground">
               Address
             </span>
             <Badge variant="secondary">{blockchainName}</Badge>
+            <Badge variant="secondary">{contractTypeFormatted}</Badge>
           </div>
           <div className="flex items-center gap-2">
             <p className="break-all text-sm sm:text-base">{address}</p>
@@ -126,6 +129,7 @@ export default async function WalletOverview({
           amountReceived={amountReceived}
           firstActive={firstActiveDate}
           lastActive={lastActiveDate}
+          contractType={contractType}
         />
       </div>
     </div>

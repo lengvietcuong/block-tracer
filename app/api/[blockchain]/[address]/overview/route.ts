@@ -31,11 +31,18 @@ export async function GET(
            lastTransferAt { unixtime }
          }
        }
+       address(address: {is: "${address}"}) {
+         smartContract {
+           contractType
+         }
+       }
      }
    }`;
-
+   
+   
   const response = await axios.post(BIT_QUERY_URL, { query }, { headers });
   const walletDetails = response.data.data.ethereum.addressStats[0].address;
+  const contractType = response.data.data.ethereum.address[0].smartContract ? 'contract' : 'eoa';
 
   // Format response with proper number conversions and convert unix timestamps to dates
   return NextResponse.json({
@@ -46,5 +53,6 @@ export async function GET(
     amountSent: Number(walletDetails.sendAmount),
     firstActive: new Date(walletDetails.firstTransferAt.unixtime * 1000),
     lastActive: new Date(walletDetails.lastTransferAt.unixtime * 1000),
+    contractType: contractType,
   });
 }

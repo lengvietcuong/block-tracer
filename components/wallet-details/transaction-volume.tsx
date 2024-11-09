@@ -23,6 +23,7 @@ interface TransactionVolumeProps {
   amountReceived: number;
   firstActive: Date;
   lastActive: Date;
+  contractType: string;
 }
 
 type TimeFrame = "all" | "daily" | "monthly" | "yearly";
@@ -36,6 +37,7 @@ export function TransactionVolume({
   amountReceived,
   firstActive,
   lastActive,
+  contractType,
 }: TransactionVolumeProps) {
   // State to manage selected time frame for averages
   const [timeFrame, setTimeFrame] = useState<TimeFrame>("all");
