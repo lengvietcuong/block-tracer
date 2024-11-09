@@ -50,41 +50,46 @@ export async function getSwincoinWalletOverview(address: string) {
       `,
       { address }
     );
+    if(result.records.length > 0) {
+      const record = result.records[0];
+      console.log(record);
+      // Parse timestamps as integers
+      const firstSent = record.get('firstSent') ? parseInt(record.get('firstSent'), 10) : null;
+      const firstReceived = record.get('firstReceived') ? parseInt(record.get('firstReceived'), 10) : null;
+      const lastSent = record.get('lastSent') ? parseInt(record.get('lastSent'), 10) : null;
+      const lastReceived = record.get('lastReceived') ? parseInt(record.get('lastReceived'), 10) : null;
 
-    const record = result.records[0];
+      // Determine firstActive and lastActive timestamps
+      const validTimestamps = [firstSent, firstReceived].filter((t) => t !== null);
+      const firstActiveUnix = validTimestamps.length > 0 ? Math.min(...validTimestamps) : null;
 
-    // Parse timestamps as integers
-    const firstSent = record.get('firstSent') ? parseInt(record.get('firstSent'), 10) : null;
-    const firstReceived = record.get('firstReceived') ? parseInt(record.get('firstReceived'), 10) : null;
-    const lastSent = record.get('lastSent') ? parseInt(record.get('lastSent'), 10) : null;
-    const lastReceived = record.get('lastReceived') ? parseInt(record.get('lastReceived'), 10) : null;
+      const validLastTimestamps = [lastSent, lastReceived].filter((t) => t !== null);
+      const lastActiveUnix = validLastTimestamps.length > 0 ? Math.max(...validLastTimestamps) : null;
 
-    // Determine firstActive and lastActive timestamps
-    const firstActiveUnix = Math.min(...[firstSent, firstReceived].filter((t) => t !== null));
-    const lastActiveUnix = Math.max(...[lastSent, lastReceived].filter((t) => t !== null));
+      // Create Date objects only if valid timestamps are present
+      const firstActive = firstActiveUnix ? new Date(firstActiveUnix * 1000) : null;
+      const lastActive = lastActiveUnix ? new Date(lastActiveUnix * 1000) : null;
 
-    // Create Date objects
+      const balance = record.get('balance') ? parseFloat(record.get('balance')) : 0;
 
-    const firstActive = new Date(firstActiveUnix * 1000);
-    const lastActive = new Date(lastActiveUnix * 1000);
+      return {
+        balance,
+        sentCount: record.get('sentCount') ? parseInt(record.get('sentCount'), 10) : 0,
+        receivedCount: record.get('receivedCount') ? parseInt(record.get('receivedCount'), 10) : 0,
+        amountSent: record.get('amountSent') ? parseFloat(record.get('amountSent')) : 0,
+        amountReceived: record.get('amountReceived') ? parseFloat(record.get('amountReceived')) : 0,
+        firstActive: firstActive,
+        lastActive: lastActive,
+        contractType: 'eoa',
+      };
+    }
 
-    console.log("neo4j: " + firstActive);
-
-    const balance = record.get('balance') ? parseFloat(record.get('balance')) : 0;
-
-    return NextResponse.json({
-      balance,
-      sentCount: record.get('sentCount') ? parseInt(record.get('sentCount'), 10) : 0,
-      receivedCount: record.get('receivedCount') ? parseInt(record.get('receivedCount'), 10) : 0,
-      amountSent: record.get('amountSent') ? parseFloat(record.get('amountSent')) : 0,
-      amountReceived: record.get('amountReceived') ? parseFloat(record.get('amountReceived')) : 0,
-      firstActive,
-      lastActive,
-    });
   } finally {
     await session.close();
+    await driver.close();
   }
 }
+
 
 export async function GET(
   _request: Request,
@@ -93,7 +98,7 @@ export async function GET(
   const { blockchain, address } = params;
 
   if (blockchain === 'swc') {
-    const result = getSwincoinWalletOverview(address);
+    const result = await getSwincoinWalletOverview(address);
     return NextResponse.json(result);
   }
   // GraphQL query to fetch comprehensive wallet statistics including balance,
@@ -113,15 +118,17 @@ export async function GET(
             lastTransferAt { unixtime }
           }
         }
+       address(address: {is: "${address}"}) {
+         smartContract {
+           contractType
+         }
+       }
       }
     }`;
 
-    const res = getSwincoinWalletOverview(address);
-    // console.log(res);
-
     const response = await axios.post(BIT_QUERY_URL, { query }, { headers });
     const walletDetails = response.data.data.ethereum.addressStats[0].address;
-    console.log("bitquery: " + new Date(walletDetails.firstTransferAt.unixtime * 1000));
+    const contractType = response.data.data.ethereum.address[0].smartContract ? 'contract' : 'eoa';
 
     // Format response with proper number conversions and convert unix timestamps to dates
     return NextResponse.json({
@@ -132,6 +139,7 @@ export async function GET(
       amountSent: Number(walletDetails.sendAmount),
       firstActive: new Date(walletDetails.firstTransferAt.unixtime * 1000),
       lastActive: new Date(walletDetails.lastTransferAt.unixtime * 1000),
+      contractType: contractType,
     });
   }
 }

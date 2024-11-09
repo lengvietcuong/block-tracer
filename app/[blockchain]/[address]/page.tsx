@@ -43,7 +43,7 @@ export default function Home({
       <main className="spacing-section pt-4">
         <WalletDetails
           blockchainSymbol={blockchainSymbol}
-          address={address}
+          address={address.startsWith("0x") ? address : ""}
           orderBy={sort}
           limit={TRANSACTIONS_PER_PAGE}
           offset={offset}

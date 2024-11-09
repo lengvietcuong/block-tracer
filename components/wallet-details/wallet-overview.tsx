@@ -26,14 +26,17 @@ export default async function WalletOverview({
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/${blockchainSymbol}/${address}/overview`,
     { cache: 'no-store' },
   );
+
   let data;
   try {
     data = await response.json();
   } catch (error) {
     console.error("Failed to parse JSON:", error);
-    // Handle the error, e.g., return default values or display an error message
+    // Provide default values or handle the error as needed
+    data = {}; // or default values for each field
   }
 
+  // Destructure fields from the data variable
   const {
     balance,
     sentCount,
@@ -43,7 +46,8 @@ export default async function WalletOverview({
     firstActive,
     lastActive,
     contractType,
-  } = await response.json();
+  } = data;
+  console.log(data)
 
   // Format the first and last active dates
   const firstActiveDate = new Date(firstActive);
@@ -53,7 +57,7 @@ export default async function WalletOverview({
 
   // Get the full blockchain name from its symbol (e.g. "eth" -> "Ethereum")
   const blockchainName = BLOCKCHAIN_NAMES[blockchainSymbol];
-  const contractTypeFormatted = contractType === "contract" ? "Contract" : "External Owned Account";
+  const contractTypeFormatted = contractType === "contract" ? "Contract" : "EOA";
 
   // Convert from crypto to USD
   const balanceUsdValue = convertToUsd(balance, blockchainSymbol);
