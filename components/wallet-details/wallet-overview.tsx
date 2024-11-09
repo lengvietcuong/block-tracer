@@ -26,6 +26,14 @@ export default async function WalletOverview({
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/${blockchainSymbol}/${address}/overview`,
     { cache: 'no-store' },
   );
+  let data;
+  try {
+    data = await response.json();
+  } catch (error) {
+    console.error("Failed to parse JSON:", error);
+    // Handle the error, e.g., return default values or display an error message
+  }
+
   const {
     balance,
     sentCount,
@@ -34,7 +42,7 @@ export default async function WalletOverview({
     amountReceived,
     firstActive,
     lastActive,
-  } = await response.json();
+  } = data;
 
   // Format the first and last active dates
   const firstActiveDate = new Date(firstActive);
