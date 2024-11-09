@@ -2,7 +2,8 @@
 
 import axios from "axios";
 import { BlockchainSymbol, Transaction, TransactionPartial } from "@/types";
-import { TRANSACTIONS_PER_PAGE, COIN_NAMES } from "@/constants";
+import { TRANSACTIONS_PER_PAGE, COIN_NAMES, BIT_QUERY_URL } from "@/constants";
+import * as swincoin from './swincoin'; // Import Swincoin functions
 
 const URL = "https://graphql.bitquery.io/";
 const headers = {
@@ -10,10 +11,15 @@ const headers = {
   "X-API-KEY": process.env.BIT_QUERY_API_KEY,
 };
 
+// Unified function to get wallet overview
 export async function getWalletOverview(
   blockchainSymbol: BlockchainSymbol,
   address: string
 ) {
+  if (blockchainSymbol === 'swc') {
+    return swincoin.getWalletOverview(address);
+  }
+
   const query = `
   {
     ethereum(network: ${COIN_NAMES[blockchainSymbol]}) {
@@ -31,7 +37,7 @@ export async function getWalletOverview(
     }
   }`;
 
-  const response = await axios.post(URL, { query }, { headers });
+  const response = await axios.post(BIT_QUERY_URL, { query }, { headers });
   const walletDetails = response.data.data.ethereum.addressStats[0].address;
 
   return {
@@ -45,6 +51,7 @@ export async function getWalletOverview(
   };
 }
 
+// Unified function to get transactions
 export async function getTransactions(
   blockchainSymbol: BlockchainSymbol,
   address: string,
@@ -52,6 +59,10 @@ export async function getTransactions(
   limit: number = TRANSACTIONS_PER_PAGE,
   offset: number = 0
 ): Promise<TransactionPartial[]> {
+  if (blockchainSymbol === 'swc') {
+    return swincoin.getTransactions(address, orderBy, limit, offset);
+  }
+
   const query = `
     {
       ethereum(network: ${COIN_NAMES[blockchainSymbol]}) {
@@ -77,9 +88,8 @@ export async function getTransactions(
       }
     }`;
 
-  const response = await axios.post(URL, { query }, { headers });
+  const response = await axios.post(BIT_QUERY_URL, { query }, { headers });
   const transactions = [...response.data.data.ethereum.transactions];
-
   return transactions.map((tx: any) => ({
     fromAddress: tx.sender.address,
     toAddress: tx.to.address,
@@ -89,10 +99,15 @@ export async function getTransactions(
   }));
 }
 
+// Unified function to get transaction details
 export async function getTransactionDetails(
   hash: string,
   blockchainSymbol: BlockchainSymbol
 ): Promise<Omit<Transaction, keyof TransactionPartial>> {
+  if (blockchainSymbol === 'swc') {
+    return swincoin.getTransactionDetails(hash);
+  }
+
   const query = `
     {
       ethereum(network: ${COIN_NAMES[blockchainSymbol]}) {
@@ -110,7 +125,7 @@ export async function getTransactionDetails(
       }
     }`;
 
-  const response = await axios.post(URL, { query }, { headers });
+  const response = await axios.post(BIT_QUERY_URL, { query }, { headers });
   const tx = response.data.data.ethereum.transactions[0];
 
   // Fetch block hash separately because the BitQuery API doesn't support fetching it in the transaction query
@@ -129,92 +144,15 @@ export async function getTransactionDetails(
   };
 }
 
-async function getBlockHash(height: number, coin: string): Promise<string> {
-  const query = `
-    {
-      ethereum(network: ${coin}) {
-        blocks(
-          height: {is: ${height}}
-        ) {
-          hash
-        }
-      }
-    }`;
-
-  const response = await axios.post(URL, { query }, { headers });
-  return response.data.data.ethereum.blocks[0].hash;
-}
-
-export async function getTotalTransactions(
-  blockchainSymbol: BlockchainSymbol,
-  address: string
-): Promise<number> {
-  const query = `
-    {
-      ethereum(network: ${COIN_NAMES[blockchainSymbol]}) {
-        transactions(
-          any: [
-            {txTo: {is: "${address}"}},
-            {txSender: {is: "${address}"}}
-          ]
-        ) {
-          count
-        }
-      }
-    }`;
-  const response = await axios.post(URL, { query }, { headers });
-  return response.data.data.ethereum.transactions[0].count;
-}
-
-export async function getMonthlyTransactionCount(
-  blockchainSymbol: BlockchainSymbol,
-  address: string
-) {
-  const receivedQuery = `
-    {
-      ethereum(network: ${COIN_NAMES[blockchainSymbol]}) {
-        transfers(
-          receiver: {is: "${address}"}
-        ) {
-          date { month, year }
-          count
-        }
-      }
-    }`;
-  const sentQuery = `
-    {
-      ethereum(network: ${COIN_NAMES[blockchainSymbol]}) {
-        transfers(
-          sender: {is: "${address}"}
-        ) {
-          date { month, year }
-          count
-        }
-      }
-    }`;
-  const [receivedResponse, sentResponse] = await Promise.all([
-    axios.post(URL, { query: receivedQuery }, { headers }),
-    axios.post(URL, { query: sentQuery }, { headers }),
-  ]);
-  const receivedTransactions = receivedResponse.data.data.ethereum.transfers;
-  const sentTransactions = sentResponse.data.data.ethereum.transfers;
-
-  return {
-    received: receivedTransactions.map((tx: any) => ({
-      count: Number(tx.count),
-      date: new Date(tx.date.year, tx.date.month - 1),
-    })),
-    sent: sentTransactions.map((tx: any) => ({
-      count: Number(tx.count),
-      date: new Date(tx.date.year, tx.date.month - 1),
-    })),
-  };
-}
-
+// Unified function to get top interactions
 export async function getTopInteractions(
   blockchainSymbol: BlockchainSymbol,
   address: string
 ) {
+  if (blockchainSymbol === 'swc') {
+    return swincoin.getTopInteractions(address);
+  }
+
   const topReceivedQuery = `
   {
     ethereum(network: ${COIN_NAMES[blockchainSymbol]}) {
@@ -257,12 +195,11 @@ export async function getTopInteractions(
     }
   }`;
 
-  const [topReceivedResponse, topSentResponse, totalCountResponse] =
-    await Promise.all([
-      axios.post(URL, { query: topReceivedQuery }, { headers }),
-      axios.post(URL, { query: topSentQuery }, { headers }),
-      axios.post(URL, { query: totalCountQuery }, { headers }),
-    ]);
+  const [topReceivedResponse, topSentResponse, totalCountResponse] = await Promise.all([
+    axios.post(BIT_QUERY_URL, { query: topReceivedQuery }, { headers }),
+    axios.post(BIT_QUERY_URL, { query: topSentQuery }, { headers }),
+    axios.post(BIT_QUERY_URL, { query: totalCountQuery }, { headers }),
+  ]);
 
   const totalReceivedCount =
     totalCountResponse.data.data.ethereum.addressStats[0].address
@@ -283,6 +220,97 @@ export async function getTopInteractions(
       percentage: (Number(tx.count) / totalSentCount) * 100,
     })
   );
-
   return { topReceived, topSent };
+}
+
+// Unified function to get monthly transaction count
+export async function getMonthlyTransactionCount(
+  blockchainSymbol: BlockchainSymbol,
+  address: string
+) {
+  if (blockchainSymbol === 'swc') {
+    return swincoin.getMonthlyTransactionCount(address);
+  }
+
+  const receivedQuery = `
+    {
+      ethereum(network: ${COIN_NAMES[blockchainSymbol]}) {
+        transfers(
+          receiver: {is: "${address}"}
+        ) {
+          date { month, year }
+          count
+        }
+      }
+    }`;
+  const sentQuery = `
+    {
+      ethereum(network: ${COIN_NAMES[blockchainSymbol]}) {
+        transfers(
+          sender: {is: "${address}"}
+        ) {
+          date { month, year }
+          count
+        }
+      }
+    }`;
+
+  const [receivedResponse, sentResponse] = await Promise.all([
+    axios.post(BIT_QUERY_URL, { query: receivedQuery }, { headers }),
+    axios.post(BIT_QUERY_URL, { query: sentQuery }, { headers }),
+  ]);
+
+  const receivedTransactions = receivedResponse.data.data.ethereum.transfers;
+  const sentTransactions = sentResponse.data.data.ethereum.transfers;
+  return {
+    received: receivedTransactions.map((tx: any) => ({
+      count: Number(tx.count),
+      date: new Date(tx.date.year, tx.date.month - 1),
+    })),
+    sent: sentTransactions.map((tx: any) => ({
+      count: Number(tx.count),
+      date: new Date(tx.date.year, tx.date.month - 1),
+    })),
+  };
+}
+
+// Helper function to get block hash (unchanged)
+async function getBlockHash(height: number, coin: string): Promise<string> {
+  const query = `
+    {
+      ethereum(network: ${coin}) {
+        blocks(
+          height: {is: ${height}}
+        ) {
+          hash
+        }
+      }
+    }`;
+
+  const response = await axios.post(URL, { query }, { headers });
+  return response.data.data.ethereum.blocks[0].hash;
+}
+
+export async function getTotalTransactions(
+  blockchainSymbol: BlockchainSymbol,
+  address: string
+): Promise<number> {
+  if (blockchainSymbol === 'swc') {
+    return swincoin.getTotalTransactions(address);
+  }
+  const query = `
+    {
+      ethereum(network: ${COIN_NAMES[blockchainSymbol]}) {
+        transactions(
+          any: [
+            {txTo: {is: "${address}"}},
+            {txSender: {is: "${address}"}}
+          ]
+        ) {
+          count
+        }
+      }
+    }`;
+  const response = await axios.post(URL, { query }, { headers });
+  return response.data.data.ethereum.transactions[0].count;
 }
