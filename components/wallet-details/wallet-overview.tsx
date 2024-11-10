@@ -44,11 +44,17 @@ export default async function WalletOverview({
     lastActive,
   } = data;
 
-  // Format the first and last active dates
-  const firstActiveDate = new Date(firstActive);
-  const lastActiveDate = new Date(lastActive);
-  const firstActiveFormatted = format(firstActiveDate, "MMM d, yyyy");
-  const lastActiveFormatted = format(lastActiveDate, "MMM d, yyyy");
+  // Check if firstActive and lastActive are valid before creating Date objects
+  const firstActiveDate = firstActive ? new Date(firstActive) : null;
+  const lastActiveDate = lastActive ? new Date(lastActive) : null;
+
+  // Format dates if they are valid
+  const firstActiveFormatted = firstActiveDate
+    ? format(firstActiveDate, "MMM d, yyyy")
+    : "N/A";
+  const lastActiveFormatted = lastActiveDate
+    ? format(lastActiveDate, "MMM d, yyyy")
+    : "N/A";
 
   // Get the full blockchain name from its symbol (e.g. "eth" -> "Ethereum")
   const blockchainName = BLOCKCHAIN_NAMES[blockchainSymbol];
@@ -102,7 +108,7 @@ export default async function WalletOverview({
               </div>
               <p className="">{firstActiveFormatted}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                {getTimeAgo(firstActiveDate)}
+                {firstActiveDate ? getTimeAgo(firstActiveDate) : "N/A"}
               </p>
             </div>
 
@@ -115,7 +121,7 @@ export default async function WalletOverview({
               </div>
               <p className="">{lastActiveFormatted}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                {getTimeAgo(lastActiveDate)}
+                {lastActiveDate ? getTimeAgo(lastActiveDate) : "N/A"}
               </p>
             </div>
           </div>
@@ -132,8 +138,8 @@ export default async function WalletOverview({
           receivedCount={receivedCount}
           amountSent={amountSent}
           amountReceived={amountReceived}
-          firstActive={firstActiveDate}
-          lastActive={lastActiveDate}
+          firstActive={firstActiveDate ?? new Date(0)}
+          lastActive={lastActiveDate ?? new Date(0)}
         />
       </div>
     </div>

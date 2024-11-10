@@ -68,16 +68,15 @@ export async function getSwincoinWalletOverview(address: string) {
     const firstActive = new Date(firstActiveUnix * 1000);
     const lastActive = new Date(lastActiveUnix * 1000);
 
-    console.log("neo4j: " + firstActive);
+    const balance = record.get('balance') ? parseFloat(record.get('balance')) / 1e18 : 0;
 
-    const balance = record.get('balance') ? parseFloat(record.get('balance')) : 0;
-
-    return NextResponse.json({
+    // console.log("neo4j: " + balance);
+    return ({
       balance,
       sentCount: record.get('sentCount') ? parseInt(record.get('sentCount'), 10) : 0,
       receivedCount: record.get('receivedCount') ? parseInt(record.get('receivedCount'), 10) : 0,
-      amountSent: record.get('amountSent') ? parseFloat(record.get('amountSent')) : 0,
-      amountReceived: record.get('amountReceived') ? parseFloat(record.get('amountReceived')) : 0,
+      amountSent: record.get('amountSent') ? parseFloat(record.get('amountSent')) / 1e18 : 0,
+      amountReceived: record.get('amountReceived') ? parseFloat(record.get('amountReceived')) / 1e18 : 0,
       firstActive,
       lastActive,
     });
@@ -93,7 +92,7 @@ export async function GET(
   const { blockchain, address } = params;
 
   if (blockchain === 'swc') {
-    const result = getSwincoinWalletOverview(address);
+    const result = await getSwincoinWalletOverview(address);
     return NextResponse.json(result);
   }
   // GraphQL query to fetch comprehensive wallet statistics including balance,
@@ -116,12 +115,12 @@ export async function GET(
       }
     }`;
 
-    const res = getSwincoinWalletOverview(address);
+    // const res = await getSwincoinWalletOverview(address);
     // console.log(res);
 
     const response = await axios.post(BIT_QUERY_URL, { query }, { headers });
     const walletDetails = response.data.data.ethereum.addressStats[0].address;
-    console.log("bitquery: " + new Date(walletDetails.firstTransferAt.unixtime * 1000));
+    // console.log("bitquery: " + Math.abs(Number(walletDetails.balance)));
 
     // Format response with proper number conversions and convert unix timestamps to dates
     return NextResponse.json({
