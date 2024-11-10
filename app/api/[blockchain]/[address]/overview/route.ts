@@ -69,21 +69,22 @@ export async function getSwincoinWalletOverview(address: string) {
       // Create Date objects only if valid timestamps are present
       const firstActive = firstActiveUnix ? new Date(firstActiveUnix * 1000) : null;
       const lastActive = lastActiveUnix ? new Date(lastActiveUnix * 1000) : null;
+    // Create Date objects
 
-      const balance = record.get('balance') ? parseFloat(record.get('balance')) : 0;
+    const firstActive = new Date(firstActiveUnix * 1000);
+    const lastActive = new Date(lastActiveUnix * 1000);
 
-      return {
-        balance,
-        sentCount: record.get('sentCount') ? parseInt(record.get('sentCount'), 10) : 0,
-        receivedCount: record.get('receivedCount') ? parseInt(record.get('receivedCount'), 10) : 0,
-        amountSent: record.get('amountSent') ? parseFloat(record.get('amountSent')) : 0,
-        amountReceived: record.get('amountReceived') ? parseFloat(record.get('amountReceived')) : 0,
-        firstActive: firstActive,
-        lastActive: lastActive,
-        contractType: 'eoa',
-      };
-    }
+    const balance = record.get('balance') ? parseFloat(record.get('balance')) / 1e18 : 0;
 
+    return ({
+      balance,
+      sentCount: record.get('sentCount') ? parseInt(record.get('sentCount'), 10) : 0,
+      receivedCount: record.get('receivedCount') ? parseInt(record.get('receivedCount'), 10) : 0,
+      amountSent: record.get('amountSent') ? parseFloat(record.get('amountSent')) / 1e18 : 0,
+      amountReceived: record.get('amountReceived') ? parseFloat(record.get('amountReceived')) / 1e18 : 0,
+      firstActive,
+      lastActive,
+    });
   } finally {
     await session.close();
     await driver.close();
@@ -128,7 +129,6 @@ export async function GET(
 
     const response = await axios.post(BIT_QUERY_URL, { query }, { headers });
     const walletDetails = response.data.data.ethereum.addressStats[0].address;
-    const contractType = response.data.data.ethereum.address[0].smartContract ? 'contract' : 'eoa';
 
     // Format response with proper number conversions and convert unix timestamps to dates
     return NextResponse.json({

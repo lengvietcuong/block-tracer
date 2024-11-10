@@ -35,7 +35,10 @@ export function getTimeAgo(date: Date) {
 }
 
 export function formatAmount(amount: number, maximumFractionDigits = 5) {
-  return amount.toLocaleString("en-US", {
+  if (typeof amount !== 'number' || isNaN(amount)) {
+    return 'N/A'; // or any default fallback value
+  }
+  return amount.toLocaleString('en-US', {
     minimumFractionDigits: 0,
     maximumFractionDigits: maximumFractionDigits,
   });
