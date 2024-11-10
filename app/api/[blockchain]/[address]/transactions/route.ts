@@ -89,9 +89,6 @@ export async function GET(
     return NextResponse.json(transactions);
   }
 
-  const swctransactions = await getSWCTransactions(address, limit, offset, orderBy);
-  console.log(swctransactions);
-
   // Query to fetch paginated transaction history, sorted by either timestamp or amount
   const query = `
    {

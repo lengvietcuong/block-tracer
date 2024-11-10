@@ -62,7 +62,7 @@ export default async function WalletOverview({
 
   // Get the full blockchain name from its symbol (e.g. "eth" -> "Ethereum")
   const blockchainName = BLOCKCHAIN_NAMES[blockchainSymbol];
-  const contractTypeFormatted = contractType === "contract" ? "Contract" : "EOA";
+  const contractTypeFormatted = contractType != 'eoa' ? "Contract" : "EOA";
 
   // Convert from crypto to USD
   const balanceUsdValue = convertToUsd(balance, blockchainSymbol);

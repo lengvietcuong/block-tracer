@@ -37,6 +37,7 @@ export async function getSwincoinWalletOverview(address: string) {
       MATCH (addr:Address {address: $address})
       OPTIONAL MATCH (addr)-[:SENT]->(sentTx:Transaction)
       OPTIONAL MATCH (receivedTx:Transaction)-[:RECEIVED_BY]->(addr)
+      MATCH (addid: Address{addressId: $address})
       RETURN
         COUNT(DISTINCT sentTx) AS sentCount,
         COUNT(DISTINCT receivedTx) AS receivedCount,
@@ -46,51 +47,46 @@ export async function getSwincoinWalletOverview(address: string) {
         MIN(sentTx.block_timestamp) AS firstSent,
         MIN(receivedTx.block_timestamp) AS firstReceived,
         MAX(sentTx.block_timestamp) AS lastSent,
-        MAX(receivedTx.block_timestamp) AS lastReceived
+        MAX(receivedTx.block_timestamp) AS lastReceived,
+        addid.type
       `,
       { address }
     );
-    if(result.records.length > 0) {
-      const record = result.records[0];
-      console.log(record);
-      // Parse timestamps as integers
-      const firstSent = record.get('firstSent') ? parseInt(record.get('firstSent'), 10) : null;
-      const firstReceived = record.get('firstReceived') ? parseInt(record.get('firstReceived'), 10) : null;
-      const lastSent = record.get('lastSent') ? parseInt(record.get('lastSent'), 10) : null;
-      const lastReceived = record.get('lastReceived') ? parseInt(record.get('lastReceived'), 10) : null;
 
-      // Determine firstActive and lastActive timestamps
-      const validTimestamps = [firstSent, firstReceived].filter((t) => t !== null);
-      const firstActiveUnix = validTimestamps.length > 0 ? Math.min(...validTimestamps) : null;
+    const record = result.records[0];
 
-      const validLastTimestamps = [lastSent, lastReceived].filter((t) => t !== null);
-      const lastActiveUnix = validLastTimestamps.length > 0 ? Math.max(...validLastTimestamps) : null;
+    // Parse timestamps as integers
+    const firstSent = record.get('firstSent') ? parseInt(record.get('firstSent'), 10) : null;
+    const firstReceived = record.get('firstReceived') ? parseInt(record.get('firstReceived'), 10) : null;
+    const lastSent = record.get('lastSent') ? parseInt(record.get('lastSent'), 10) : null;
+    const lastReceived = record.get('lastReceived') ? parseInt(record.get('lastReceived'), 10) : null;
 
-      // Create Date objects only if valid timestamps are present
-      const firstActive = firstActiveUnix ? new Date(firstActiveUnix * 1000) : null;
-      const lastActive = lastActiveUnix ? new Date(lastActiveUnix * 1000) : null;
+    // Determine firstActive and lastActive timestamps
+    const firstActiveUnix = Math.min(...[firstSent, firstReceived].filter((t) => t !== null));
+    const lastActiveUnix = Math.max(...[lastSent, lastReceived].filter((t) => t !== null));
+
     // Create Date objects
 
     const firstActive = new Date(firstActiveUnix * 1000);
     const lastActive = new Date(lastActiveUnix * 1000);
 
     const balance = record.get('balance') ? parseFloat(record.get('balance')) / 1e18 : 0;
+    const type = record.get('addid.type');
 
     return ({
-      balance,
+      balance: Math.abs(balance),
       sentCount: record.get('sentCount') ? parseInt(record.get('sentCount'), 10) : 0,
       receivedCount: record.get('receivedCount') ? parseInt(record.get('receivedCount'), 10) : 0,
       amountSent: record.get('amountSent') ? parseFloat(record.get('amountSent')) / 1e18 : 0,
       amountReceived: record.get('amountReceived') ? parseFloat(record.get('amountReceived')) / 1e18 : 0,
       firstActive,
       lastActive,
+      contractType: type,
     });
   } finally {
     await session.close();
-    await driver.close();
   }
 }
-
 
 export async function GET(
   _request: Request,
@@ -119,16 +115,17 @@ export async function GET(
             lastTransferAt { unixtime }
           }
         }
-       address(address: {is: "${address}"}) {
-         smartContract {
-           contractType
-         }
-       }
+        address(address: {is: "${address}"}) {
+          smartContract {
+            contractType
+          }
+        }
       }
     }`;
 
     const response = await axios.post(BIT_QUERY_URL, { query }, { headers });
     const walletDetails = response.data.data.ethereum.addressStats[0].address;
+    const contractType = response.data.data.ethereum.address[0].smartContract? response.data.data.ethereum.address[0].smartContract.contractType : 'eoa';
 
     // Format response with proper number conversions and convert unix timestamps to dates
     return NextResponse.json({
