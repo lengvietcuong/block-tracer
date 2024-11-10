@@ -139,20 +139,6 @@ export async function GET(
       }
     }`;
 
-  // const { receivedTransactions: receivedSWCTransactions, sentTransactions: sentSWCTransactions } = await getSWCMonthlyTransactions(address);
-
-  // // Format the response with proper date objects and number conversions
-  // const formattedReceived = receivedSWCTransactions.map((tx) => ({
-  //   count: tx.count,
-  //   date: new Date(tx.date.year, tx.date.month - 1),
-  // }));
-
-  // const formattedSent = sentSWCTransactions.map((tx) => ({
-  //   count: tx.count,
-  //   date: new Date(tx.date.year, tx.date.month - 1),
-  // }));
-  // console.log({ received: formattedReceived, sent: formattedSent });
-
   // Fetch both queries in parallel for better performance
   const [receivedResponse, sentResponse] = await Promise.all([
     axios.post<TransfersResponse>(BIT_QUERY_URL, { query: receivedQuery }, { headers }),

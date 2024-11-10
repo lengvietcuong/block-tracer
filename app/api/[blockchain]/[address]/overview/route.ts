@@ -70,7 +70,6 @@ export async function getSwincoinWalletOverview(address: string) {
 
     const balance = record.get('balance') ? parseFloat(record.get('balance')) / 1e18 : 0;
 
-    // console.log("neo4j: " + balance);
     return ({
       balance,
       sentCount: record.get('sentCount') ? parseInt(record.get('sentCount'), 10) : 0,
@@ -115,12 +114,8 @@ export async function GET(
       }
     }`;
 
-    // const res = await getSwincoinWalletOverview(address);
-    // console.log(res);
-
     const response = await axios.post(BIT_QUERY_URL, { query }, { headers });
     const walletDetails = response.data.data.ethereum.addressStats[0].address;
-    // console.log("bitquery: " + Math.abs(Number(walletDetails.balance)));
 
     // Format response with proper number conversions and convert unix timestamps to dates
     return NextResponse.json({

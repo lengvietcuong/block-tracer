@@ -156,9 +156,6 @@ export async function GET(
     }
   }`;
 
-  // const result = await getSWCTopInteractions(address);
-  // console.log(result);
-
   // Make parallel API calls to fetch received, sent, and total transaction data
   const [topReceivedResponse, topSentResponse, totalCountResponse] =
     await Promise.all([
@@ -216,8 +213,6 @@ export async function GET(
     count: Number(tx.count),
     percentage: (Number(tx.count) / totalSentCount) * 100,
   }));
-
-  // console.log({ topReceived, topSent });
 
   return NextResponse.json({ topReceived, topSent });
 }

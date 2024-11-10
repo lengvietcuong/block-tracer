@@ -121,16 +121,6 @@ export async function GET(
   const response = await axios.post(BIT_QUERY_URL, { query }, { headers });
   const transactions: Transaction[] = response.data.data.ethereum.transactions;
 
-  // console.log(
-  //   transactions.map((tx: Transaction) => ({
-  //     fromAddress: tx.sender.address,
-  //     toAddress: tx.to.address,
-  //     hash: tx.hash,
-  //     value: Number(tx.amount),
-  //     blockTimestamp: tx.block.timestamp.unixtime * 1000, // Convert to milliseconds
-  //   })),
-  // )
-
   // Transform the response data into a simplified format with converted timestamps
   return NextResponse.json(
     transactions.map((tx: Transaction) => ({
