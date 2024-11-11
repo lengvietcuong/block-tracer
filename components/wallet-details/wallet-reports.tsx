@@ -3,6 +3,7 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { TriangleAlert, CircleCheckBig } from "lucide-react";
 import { BlockchainSymbol } from "@/types";
+import { notFound } from "next/navigation";
 
 interface WalletReportsProps {
   blockchainSymbol: BlockchainSymbol;
@@ -68,6 +69,9 @@ export default async function WalletReports({
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/${blockchainSymbol}/${address}/reports`,
     { cache: "no-store" },
   );
+  if (response.status === 404) {
+    notFound();
+  }
   const fetchedReports = await response.json();
   const reports = processReports(fetchedReports.identifications);
   const totalReports = Object.values(reports).flat().length;

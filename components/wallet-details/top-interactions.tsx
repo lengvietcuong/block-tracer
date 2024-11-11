@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import CopyButton from "@/components/wallet-details/copy-button";
 import { abbreviateAddress } from "@/utils";
+import { notFound } from "next/navigation";
 
 interface TopInteractionData {
   address: string;
@@ -84,6 +85,9 @@ export default async function TopInteractions({
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/${blockchainSymbol}/${address}/top-interactions`,
     { cache: "no-store" },
   );
+  if (response.status === 404) {
+    notFound();
+  }
   const { topReceived, topSent } = await response.json();
 
   return (

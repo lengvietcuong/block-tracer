@@ -5,6 +5,7 @@ import { InfoIcon } from "lucide-react";
 import SortSelection from "@/components/wallet-details/sort-selection";
 import TransactionGraph from "@/components/wallet-details/transaction-graph";
 import TransactionTable from "@/components/wallet-details/transaction-table";
+import { notFound } from "next/navigation";
 
 // Define the interface for the Transactions component props
 interface TransactionsProps {
@@ -28,6 +29,9 @@ export default async function Tranasctions({
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/${blockchainSymbol}/${address}/transactions?orderBy=${orderBy}&limit=${limit}&offset=${offset}`,
     { cache: "no-store" },
   );
+  if (response.status === 404) {
+    notFound();
+  }
   const transactions = await response.json();
 
   // If there are no transactions, display an alert

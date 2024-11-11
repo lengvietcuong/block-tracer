@@ -48,9 +48,9 @@ async function getSwincoinTopInteractions(address: string) {
       ]);
 
     const totalReceivedCount =
-      totalCountResult.records[0]?.get("receiveTxCount").toNumber() || 0;
+      totalCountResult.records[0]?.get("receiveTxCount").toNumber();
     const totalSentCount =
-      totalCountResult.records[0]?.get("sendTxCount").toNumber() || 0;
+      totalCountResult.records[0]?.get("sendTxCount").toNumber();
 
     const topReceived = topReceivedResult.records.map((record) => {
       const count = record.get("count").toNumber();

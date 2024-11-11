@@ -102,7 +102,7 @@ export default function WalletDetails({
             offset={offset}
           />
         </Suspense>
-        {/* <Suspense fallback={<PagesSkeleton />}>
+        <Suspense fallback={<PagesSkeleton />}>
           <Pages
             blockchainSymbol={blockchainSymbol}
             address={address}
@@ -110,7 +110,7 @@ export default function WalletDetails({
             currentPage={Math.floor(offset / TRANSACTIONS_PER_PAGE) + 1}
             className="mx-auto mt-2"
           />
-        </Suspense> */}
+        </Suspense>
       </div>
     </div>
   );

@@ -51,13 +51,13 @@ async function getSwincoinWalletOverview(address: string) {
     const lastActiveUnix = isNaN(lastSent) ? lastReceived : lastSent;
 
     return NextResponse.json({
-      balance: Math.abs(parseFloat(record.get("balance")) / 1e18),
+      balance: Math.abs(parseFloat(record.get("balance")) / 1e18), // Convert from wei to eth
       sentCount: parseInt(record.get("sentCount")),
       receivedCount: parseInt(record.get("receivedCount")),
-      amountSent: parseFloat(record.get("amountSent")) / 1e18,
-      amountReceived: parseFloat(record.get("amountReceived")) / 1e18,
-      firstActive: new Date(firstActiveUnix * 1000),
-      lastActive: new Date(lastActiveUnix * 1000),
+      amountSent: parseFloat(record.get("amountSent")) / 1e18, // Convert from wei to eth
+      amountReceived: parseFloat(record.get("amountReceived")) / 1e18, // Convert from wei to eth
+      firstActive: new Date(firstActiveUnix * 1000), // Convert to ms
+      lastActive: new Date(lastActiveUnix * 1000), // Convert to ms
       contractType: record.get("addid.type"),
     });
   } finally {
@@ -111,8 +111,8 @@ async function getWalletOverview(
     receivedCount: Number(walletDetails.receiveTxCount),
     amountReceived: Number(walletDetails.receiveAmount),
     amountSent: Number(walletDetails.sendAmount),
-    firstActive: new Date(walletDetails.firstTransferAt.unixtime * 1000),
-    lastActive: new Date(walletDetails.lastTransferAt.unixtime * 1000),
+    firstActive: new Date(walletDetails.firstTransferAt.unixtime * 1000), // Convert to ms
+    lastActive: new Date(walletDetails.lastTransferAt.unixtime * 1000), // Convert to ms
     contractType,
   });
 }

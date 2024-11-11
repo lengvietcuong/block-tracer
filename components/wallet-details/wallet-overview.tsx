@@ -10,6 +10,7 @@ import { BLOCKCHAIN_NAMES } from "@/constants";
 import { convertToUsd, getTimeAgo, formatAmount } from "@/utils";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { notFound } from "next/navigation";
 
 interface WalletOverviewProps {
   className?: string;
@@ -26,16 +27,9 @@ export default async function WalletOverview({
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/${blockchainSymbol}/${address}/overview`,
     { cache: 'no-store' },
   );
-
-  let data;
-  try {
-    data = await response.json();
-  } catch (error) {
-    console.error("Failed to parse JSON:", error);
-    // Provide default values or handle the error as needed
-    data = {}; // or default values for each field
+  if (response.status === 404) {
+    notFound();
   }
-
   // Destructure fields from the data variable
   const {
     balance,
@@ -46,7 +40,7 @@ export default async function WalletOverview({
     firstActive,
     lastActive,
     contractType,
-  } = data;
+  } = await response.json();
 
   // Check if firstActive and lastActive are valid before creating Date objects
   const firstActiveDate = firstActive ? new Date(firstActive) : null;

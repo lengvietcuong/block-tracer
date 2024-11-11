@@ -62,7 +62,7 @@ async function getSwincoinTransactions(
         fromAddress: record.get("fromAddress"),
         toAddress: record.get("toAddress"),
         hash: record.get("hash"),
-        value: Number(record.get("value")) / 1e18, // Convert to SWC
+        value: Number(record.get("value")) / 1e18, // Convert from wei to ETH
         blockTimestamp: Number(record.get("blockTimestamp")) * 1000, // Convert to milliseconds
       })),
     );

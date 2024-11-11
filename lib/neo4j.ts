@@ -13,6 +13,7 @@ export function initializeNeo4j() {
   return neo4j.driver(neo4jUrl, neo4j.auth.basic(neo4jUser, neo4jPassword));
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function runQuery(driver: Driver, query: string, params?: any) {
   const session = driver.session();
   try {
