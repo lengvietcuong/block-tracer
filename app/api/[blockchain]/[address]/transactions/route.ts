@@ -1,83 +1,15 @@
 import { NextResponse, NextRequest } from "next/server";
 import axios from "axios";
-import neo4j, { Driver } from 'neo4j-driver';
+import neo4j from "neo4j-driver";
+import { initializeNeo4j, runQuery } from "@/lib/neo4j";
 import { BlockchainSymbol } from "@/types";
 import { TRANSACTIONS_PER_PAGE, COIN_NAMES, BIT_QUERY_URL } from "@/constants";
-
-// Load environment variables
-import dotenv from 'dotenv';
-dotenv.config();
-
-// Connect to Neo4j using credentials from .env
-const neo4jUrl = process.env.NEO4J_URL;
-const neo4jUser = process.env.NEO4J_USER;
-const neo4jPassword = process.env.NEO4J_PASSWORD;
-
-if (!neo4jUrl || !neo4jUser || !neo4jPassword) {
-  throw new Error('Missing Neo4j connection credentials');
-}
-
-const driver: Driver = neo4j.driver(
-  neo4jUrl,
-  neo4j.auth.basic(neo4jUser, neo4jPassword)
-);
-
-// API configuration for BitQuery GraphQL endpoint
-const headers = {
-  "Content-Type": "application/json",
-  "X-API-KEY": process.env.BIT_QUERY_API_KEY,
-};
-
-export async function getSWCTransactions(
-  address: string,
-  limit: number,
-  offset: number,
-  orderBy: string
-) {
-  const session = driver.session();
-  try {
-    const orderClause =
-      orderBy === "time" ? "ORDER BY t.block_timestamp DESC" : "ORDER BY t.value DESC";
-    const query = `
-      MATCH (sender:Address)-[:SENT]->(t:Transaction)-[:RECEIVED_BY]->(receiver:Address)
-      WHERE sender.address = $address OR receiver.address = $address
-      ${orderClause}
-      SKIP $offset
-      LIMIT $limit
-      RETURN
-        sender.address AS fromAddress,
-        receiver.address AS toAddress,
-        t.hash AS hash,
-        t.value AS value,
-        t.block_timestamp AS blockTimestamp
-    `;
-    const result = await session.run(query, {
-      address,
-      limit: neo4j.int(limit),
-      offset: neo4j.int(offset),
-    });
-
-    const transactions = result.records.map((record: any) => ({
-      fromAddress: record.get('fromAddress'),
-      toAddress: record.get('toAddress'),
-      hash: record.get('hash'),
-      value: Number(record.get('value')) / 1e18, // Convert to SWC
-      blockTimestamp: Number(record.get('blockTimestamp')) * 1000, // Convert to milliseconds
-    }));
-
-    // Return the transactions
-    return transactions;
-  } finally {
-    await session.close();
-  }
-}
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { blockchain: BlockchainSymbol; address: string } },
 ) {
   const { blockchain, address } = params;
-
   // Extract pagination and sorting parameters from the request URL
   const searchParams = request.nextUrl.searchParams;
   const orderBy = (searchParams.get("orderBy") as "time" | "amount") || "time";
@@ -85,10 +17,73 @@ export async function GET(
   const offset = Number(searchParams.get("offset")) || 0;
 
   if (blockchain === "swc") {
-    const transactions = await getSWCTransactions(address, limit, offset, orderBy);
-    return NextResponse.json(transactions);
+    return getSwincoinTransactions(address, limit, offset, orderBy);
   }
+  return getTransactions(blockchain, address, limit, offset, orderBy);
+}
 
+async function getSwincoinTransactions(
+  address: string,
+  limit: number,
+  offset: number,
+  orderBy: string,
+) {
+  // Connect to Neo4j
+  const neo4jDriver = initializeNeo4j();
+
+  const orderClause =
+    orderBy === "time"
+      ? "ORDER BY t.block_timestamp DESC"
+      : "ORDER BY t.value DESC";
+  const query = `
+    MATCH (sender:Address)-[:SENT]->(t:Transaction)-[:RECEIVED_BY]->(receiver:Address)
+    WHERE sender.address = $address OR receiver.address = $address
+    ${orderClause}
+    SKIP $offset
+    LIMIT $limit
+    RETURN
+      sender.address AS fromAddress,
+      receiver.address AS toAddress,
+      t.hash AS hash,
+      t.value AS value,
+      t.block_timestamp AS blockTimestamp
+  `;
+
+  try {
+    const result = await runQuery(neo4jDriver, query, {
+      address,
+      limit: neo4j.int(limit),
+      offset: neo4j.int(offset),
+    });
+    const records = result.records;
+
+    return NextResponse.json(
+      records.map((record) => ({
+        fromAddress: record.get("fromAddress"),
+        toAddress: record.get("toAddress"),
+        hash: record.get("hash"),
+        value: Number(record.get("value")) / 1e18, // Convert to SWC
+        blockTimestamp: Number(record.get("blockTimestamp")) * 1000, // Convert to milliseconds
+      })),
+    );
+  } finally {
+    // Close Neo4j
+    await neo4jDriver.close();
+  }
+}
+
+async function getTransactions(
+  blockchain: BlockchainSymbol,
+  address: string,
+  limit: number,
+  offset: number,
+  orderBy: string,
+) {
+  // API configuration for BitQuery GraphQL endpoint
+  const headers = {
+    "Content-Type": "application/json",
+    "X-API-KEY": process.env.BIT_QUERY_API_KEY,
+  };
   // Query to fetch paginated transaction history, sorted by either timestamp or amount
   const query = `
    {

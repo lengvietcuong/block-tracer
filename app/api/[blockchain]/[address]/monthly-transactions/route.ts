@@ -1,118 +1,86 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
-import neo4j, { Driver } from 'neo4j-driver';
+import { initializeNeo4j, runQuery } from "@/lib/neo4j";
 import { BlockchainSymbol } from "@/types";
 import { COIN_NAMES, BIT_QUERY_URL } from "@/constants";
 
-// Load environment variables
-import dotenv from 'dotenv';
-dotenv.config();
-
-// Connect to Neo4j using credentials from .env
-const neo4jUrl = process.env.NEO4J_URL;
-const neo4jUser = process.env.NEO4J_USER;
-const neo4jPassword = process.env.NEO4J_PASSWORD;
-
-if (!neo4jUrl || !neo4jUser || !neo4jPassword) {
-  throw new Error('Missing Neo4j connection credentials');
-}
-
-const driver: Driver = neo4j.driver(
-  neo4jUrl,
-  neo4j.auth.basic(neo4jUser, neo4jPassword)
-);
-
-// API configuration for BitQuery GraphQL endpoint
-const headers = {
-  "Content-Type": "application/json",
-  "X-API-KEY": process.env.BIT_QUERY_API_KEY,
-};
-
-// Function to retrieve monthly transaction counts from Neo4j for "swc"
-export async function getSWCMonthlyTransactions(address: string) {
-  const session = driver.session();
-  try {
-    // Query for received transactions
-    const receivedResult = await session.run(
-      `
-      MATCH (addr:Address {address: $address})<-[:RECEIVED_BY]-(tx:Transaction)
-      WHERE tx.block_timestamp IS NOT NULL
-      WITH date(datetime({ epochSeconds: tx.block_timestamp })) AS txDate, tx
-      RETURN
-        txDate.year AS year,
-        txDate.month AS month,
-        COUNT(tx) AS count
-      ORDER BY year, month
-      `,
-      { address }
-    );
-
-    // Query for sent transactions
-    const sentResult = await session.run(
-      `
-      MATCH (addr:Address {address: $address})-[:SENT]->(tx:Transaction)
-      WHERE tx.block_timestamp IS NOT NULL
-      WITH date(datetime({ epochSeconds: tx.block_timestamp })) AS txDate, tx
-      RETURN
-        txDate.year AS year,
-        txDate.month AS month,
-        COUNT(tx) AS count
-      ORDER BY year, month
-      `,
-      { address }
-    );
-
-    // Process received transactions
-    const receivedTransactions = receivedResult.records.map(record => ({
-      date: {
-        year: record.get('year').toNumber(),
-        month: record.get('month').toNumber(),
-      },
-      count: record.get('count').toNumber(),
-    }));
-
-    // Process sent transactions
-    const sentTransactions = sentResult.records.map(record => ({
-      date: {
-        year: record.get('year').toNumber(),
-        month: record.get('month').toNumber(),
-      },
-      count: record.get('count').toNumber(),
-    }));
-
-    return { receivedTransactions, sentTransactions };
-  } finally {
-    await session.close();
-  }
-}
-
+// Define the API endpoint /[blockchain]/[address]/monthly-transactions
 export async function GET(
   _request: Request,
   { params }: { params: { blockchain: BlockchainSymbol; address: string } },
 ) {
   const { blockchain, address } = params;
-
   if (blockchain === "swc") {
-    // Fetch monthly transactions from Neo4j
-    const { receivedTransactions, sentTransactions } = await getSWCMonthlyTransactions(address);
-
-    // Format the response with proper date objects and number conversions
-    const formattedReceived = receivedTransactions.map((tx) => ({
-      count: tx.count,
-      date: new Date(tx.date.year, tx.date.month - 1),
-    }));
-
-    const formattedSent = sentTransactions.map((tx) => ({
-      count: tx.count,
-      date: new Date(tx.date.year, tx.date.month - 1),
-    }));
-
-    return NextResponse.json({
-      received: formattedReceived,
-      sent: formattedSent,
-    });
+    return getSwincoinMonthlyTransactions(address); // Swincoin data from the school's dataset
   }
+  return getMonthlyTransactions(blockchain, address); // From the actual blockchain
+}
 
+async function getSwincoinMonthlyTransactions(address: string) {
+  // Connect to Neo4j
+  const neo4jDriver = initializeNeo4j();
+
+  // Cypher queries to fetch received transactions
+  const receivedQuery = `
+  MATCH (addr:Address {address: $address})<-[:RECEIVED_BY]-(tx:Transaction)
+  WHERE tx.block_timestamp IS NOT NULL
+  WITH date(datetime({ epochSeconds: tx.block_timestamp })) AS txDate, tx
+  RETURN
+    txDate.year AS year,
+    txDate.month AS month,
+    COUNT(tx) AS count
+  ORDER BY year, month
+  `;
+  // Cypher query to fetch sent transactions
+  const sentQuery = `
+  MATCH (addr:Address {address: $address})-[:SENT]->(tx:Transaction)
+  WHERE tx.block_timestamp IS NOT NULL
+  WITH date(datetime({ epochSeconds: tx.block_timestamp })) AS txDate, tx
+  RETURN
+    txDate.year AS year,
+    txDate.month AS month,
+    COUNT(tx) AS count
+  ORDER BY year, month
+  `;
+
+  try {
+    // Fetch received and sent transactions in parallel
+    const [receivedResult, sentResult] = await Promise.all([
+      runQuery(neo4jDriver, receivedQuery, { address }),
+      runQuery(neo4jDriver, sentQuery, { address }),
+    ]);
+    // Format the response with proper date objects and number conversions
+    return NextResponse.json({
+      received: receivedResult.records.map((record) => ({
+        date: new Date(
+          record.get("year").toNumber(),
+          record.get("month").toNumber() - 1,
+        ),
+        count: record.get("count").toNumber(),
+      })),
+      sent: sentResult.records.map((record) => ({
+        date: new Date(
+          record.get("year").toNumber(),
+          record.get("month").toNumber() - 1,
+        ),
+        count: record.get("count").toNumber(),
+      })),
+    });
+  } finally {
+    // Close Neo4j
+    await neo4jDriver.close();
+  }
+}
+
+async function getMonthlyTransactions(
+  blockchain: BlockchainSymbol,
+  address: string,
+) {
+  // API configuration for BitQuery GraphQL endpoint
+  const headers = {
+    "Content-Type": "application/json",
+    "X-API-KEY": process.env.BIT_QUERY_API_KEY,
+  };
   // GraphQL query to fetch incoming transactions for the address
   const receivedQuery = `
     {
@@ -125,7 +93,6 @@ export async function GET(
         }
       }
     }`;
-
   // GraphQL query to fetch outgoing transactions for the address
   const sentQuery = `
     {
@@ -138,13 +105,19 @@ export async function GET(
         }
       }
     }`;
-
-  // Fetch both queries in parallel for better performance
+  // Fetch both queries in parallel
   const [receivedResponse, sentResponse] = await Promise.all([
-    axios.post<TransfersResponse>(BIT_QUERY_URL, { query: receivedQuery }, { headers }),
-    axios.post<TransfersResponse>(BIT_QUERY_URL, { query: sentQuery }, { headers }),
+    axios.post<TransfersResponse>(
+      BIT_QUERY_URL,
+      { query: receivedQuery },
+      { headers },
+    ),
+    axios.post<TransfersResponse>(
+      BIT_QUERY_URL,
+      { query: sentQuery },
+      { headers },
+    ),
   ]);
-
   const receivedTransactions = receivedResponse.data.data.ethereum.transfers;
   const sentTransactions = sentResponse.data.data.ethereum.transfers;
 
@@ -174,4 +147,4 @@ type TransfersResponse = {
       }[];
     };
   };
-}
+};

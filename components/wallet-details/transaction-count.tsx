@@ -12,20 +12,21 @@ interface AggregateTransactionData {
   sent: { count: number; date: Date }[];
 }
 
-interface TransactionsOverTimeProps {
+interface TransactionsCountProps {
   blockchainSymbol: BlockchainSymbol;
   address: string;
 }
 
-export default async function TransactionsOverTime({
+export default async function TransactionsCount({
   blockchainSymbol,
   address,
-}: TransactionsOverTimeProps) {
+}: TransactionsCountProps) {
   // Fetch monthly transaction data for given blockchain address
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/${blockchainSymbol}/${address}/monthly-transactions`,
     { cache: 'no-store' },
   );
+  console.log(response);
   const data: AggregateTransactionData = await response.json();
   // Convert the date strings to Date objects
   data.received.forEach((item) => (item.date = new Date(item.date)));

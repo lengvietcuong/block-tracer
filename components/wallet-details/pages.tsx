@@ -7,7 +7,6 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
-import { getTotalTransactions } from "@/bitQuery";
 import { BlockchainSymbol } from "@/types";
 import { TRANSACTIONS_PER_PAGE } from "@/constants";
 
@@ -26,7 +25,11 @@ export default async function Pages({
   currentPage = 1,
   className,
 }: PagesProps) {
-  const numTransactions = await getTotalTransactions(blockchainSymbol, address);
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/${blockchainSymbol}/${address}/total-transactions`,
+    { cache: 'no-store' },
+  );
+  const numTransactions = await response.json();
   const numPages = Math.ceil(numTransactions / TRANSACTIONS_PER_PAGE);
 
   const maxPages = 3;

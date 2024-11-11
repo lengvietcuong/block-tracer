@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import WalletOverview from "@/components/wallet-details/wallet-overview";
 import WalletReports from "@/components/wallet-details/wallet-reports";
-import TransactionsOverTime from "@/components/wallet-details/transaction-count";
+import TransactionsCount from "@/components/wallet-details/transaction-count";
 import TopInteractions from "@/components/wallet-details/top-interactions";
 import Transactions from "@/components/wallet-details/transactions";
 import Pages from "@/components/wallet-details/pages";
@@ -68,7 +68,7 @@ export default function WalletDetails({
           Transaction Count
         </h2>
         <Suspense fallback={<TransactionCountSkeleton />}>
-          <TransactionsOverTime
+          <TransactionsCount
             address={address}
             blockchainSymbol={blockchainSymbol}
           />
@@ -102,7 +102,7 @@ export default function WalletDetails({
             offset={offset}
           />
         </Suspense>
-        <Suspense fallback={<PagesSkeleton />}>
+        {/* <Suspense fallback={<PagesSkeleton />}>
           <Pages
             blockchainSymbol={blockchainSymbol}
             address={address}
@@ -110,7 +110,7 @@ export default function WalletDetails({
             currentPage={Math.floor(offset / TRANSACTIONS_PER_PAGE) + 1}
             className="mx-auto mt-2"
           />
-        </Suspense>
+        </Suspense> */}
       </div>
     </div>
   );
