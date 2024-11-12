@@ -10,7 +10,7 @@ import { BLOCKCHAIN_NAMES } from "@/constants";
 import { convertToUsd, getTimeAgo, formatAmount } from "@/utils";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { notFound } from "next/navigation";
+import { redirectIfFailed } from "@/utils";
 
 interface WalletOverviewProps {
   className?: string;
@@ -25,12 +25,10 @@ export default async function WalletOverview({
 }: WalletOverviewProps) {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/${blockchainSymbol}/${address}/overview`,
-    { cache: 'no-store' },
+    { cache: "no-store" },
   );
-  if (response.status === 404) {
-    notFound();
-  }
-  // Destructure fields from the data variable
+  redirectIfFailed(response);
+  // Destructure fields from the response
   const {
     balance,
     sentCount,
@@ -56,7 +54,7 @@ export default async function WalletOverview({
 
   // Get the full blockchain name from its symbol (e.g. "eth" -> "Ethereum")
   const blockchainName = BLOCKCHAIN_NAMES[blockchainSymbol];
-  const contractTypeFormatted = contractType != 'eoa' ? "Contract" : "EOA";
+  const contractTypeFormatted = contractType != "eoa" ? "Contract" : "EOA";
 
   // Convert from crypto to USD
   const balanceUsdValue = convertToUsd(balance, blockchainSymbol);

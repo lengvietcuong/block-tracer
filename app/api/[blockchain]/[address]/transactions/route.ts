@@ -2,24 +2,53 @@ import { NextResponse, NextRequest } from "next/server";
 import axios from "axios";
 import neo4j from "neo4j-driver";
 import { initializeNeo4j, runQuery } from "@/lib/neo4j";
+import status from "http-status";
 import { BlockchainSymbol } from "@/types";
 import { TRANSACTIONS_PER_PAGE, COIN_NAMES, BIT_QUERY_URL } from "@/constants";
+import { isValidAddress, getJsonOfError } from "@/utils";
 
+// Define the API endpoint /api/[blockchain]/[address]/transactions
 export async function GET(
   request: NextRequest,
   { params }: { params: { blockchain: BlockchainSymbol; address: string } },
 ) {
+  // Extract parameters from the request URL
   const { blockchain, address } = params;
-  // Extract pagination and sorting parameters from the request URL
   const searchParams = request.nextUrl.searchParams;
-  const orderBy = (searchParams.get("orderBy") as "time" | "amount") || "time";
-  const limit = Number(searchParams.get("limit")) || TRANSACTIONS_PER_PAGE;
-  const offset = Number(searchParams.get("offset")) || 0;
-
-  if (blockchain === "swc") {
-    return getSwincoinTransactions(address, limit, offset, orderBy);
+  const sort = searchParams.get("sort") || "time";
+  const page = Number(searchParams.get("page")) || 1;
+  // Verify that the parameters are valid
+  if (
+    !isValidAddress(address, blockchain) ||
+    (sort !== "time" && sort !== "amount") ||
+    page < 1
+  ) {
+    return NextResponse.json(
+      { message: "Not found" },
+      { status: status.NOT_FOUND },
+    );
   }
-  return getTransactions(blockchain, address, limit, offset, orderBy);
+  const offset = (page - 1) * TRANSACTIONS_PER_PAGE;
+
+  try {
+    if (blockchain === "swc") {
+      return await getSwincoinTransactions(
+        address,
+        TRANSACTIONS_PER_PAGE,
+        offset,
+        sort,
+      ); // Swincoin data from the school's dataset
+    }
+    return await getTransactions(
+      blockchain,
+      address,
+      TRANSACTIONS_PER_PAGE,
+      offset,
+      sort,
+    ); // From the actual blockchain
+  } catch (error) {
+    return getJsonOfError(error);
+  }
 }
 
 async function getSwincoinTransactions(
@@ -55,10 +84,14 @@ async function getSwincoinTransactions(
       limit: neo4j.int(limit),
       offset: neo4j.int(offset),
     });
-    const records = result.records;
-
+    if (result.records.length === 0) {
+      return NextResponse.json(
+        { message: "Not found" },
+        { status: status.NOT_FOUND },
+      );
+    }
     return NextResponse.json(
-      records.map((record) => ({
+      result.records.map((record) => ({
         fromAddress: record.get("fromAddress"),
         toAddress: record.get("toAddress"),
         hash: record.get("hash"),
@@ -112,6 +145,12 @@ async function getTransactions(
 
   const response = await axios.post(BIT_QUERY_URL, { query }, { headers });
   const transactions: Transaction[] = response.data.data.ethereum.transactions;
+  if (transactions.length === 0) {
+    return NextResponse.json(
+      { message: "Not found" },
+      { status: status.NOT_FOUND },
+    );
+  }
 
   // Transform the response data into a simplified format with converted timestamps
   return NextResponse.json(

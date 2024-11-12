@@ -1,6 +1,6 @@
 import { BlockchainSymbol } from "@/types";
 import dynamic from "next/dynamic";
-import { notFound } from "next/navigation";
+import { redirectIfFailed } from "@/utils";
 
 // Dynamically import the chart component to avoid SSR issues with chart libraries
 const TransactionBarChart = dynamic(
@@ -27,9 +27,7 @@ export default async function TransactionsCount({
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/${blockchainSymbol}/${address}/monthly-transactions`,
     { cache: 'no-store' },
   );
-  if (response.status === 404) {
-    notFound();
-  }
+  redirectIfFailed(response);
   const data: AggregateTransactionData = await response.json();
   // Convert the date strings to Date objects
   data.received.forEach((item) => (item.date = new Date(item.date)));

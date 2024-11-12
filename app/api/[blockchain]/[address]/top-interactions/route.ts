@@ -1,19 +1,32 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { initializeNeo4j, runQuery } from "@/lib/neo4j";
+import status from "http-status";
 import { BlockchainSymbol } from "@/types";
 import { COIN_NAMES, BIT_QUERY_URL } from "@/constants";
+import { isValidAddress, getJsonOfError } from "@/utils";
 
-// Define the API endpoint /[blockchain]/[address]/top-interactions
+// Define the API endpoint /api/[blockchain]/[address]/top-interactions
 export async function GET(
   _request: Request,
   { params }: { params: { blockchain: BlockchainSymbol; address: string } },
 ) {
   const { blockchain, address } = params;
-  if (blockchain === "swc") {
-    return getSwincoinTopInteractions(address);
+  if (!isValidAddress(address, blockchain)) {
+    return NextResponse.json(
+      { message: "Not found" },
+      { status: status.NOT_FOUND },
+    );
   }
-  return getTopInteractions(blockchain, address);
+
+  try {
+    if (blockchain === "swc") {
+      return await getSwincoinTopInteractions(address); // Swincoin data from the school's dataset
+    }
+    return await getTopInteractions(blockchain, address); // From the actual blockchain
+  } catch (error) {
+    return getJsonOfError(error);
+  }
 }
 
 async function getSwincoinTopInteractions(address: string) {
@@ -46,12 +59,19 @@ async function getSwincoinTopInteractions(address: string) {
         runQuery(neo4jDriver, topSentQuery, { address }),
         runQuery(neo4jDriver, totalCountQuery, { address }),
       ]);
+    if (totalCountResult.records.length === 0) {
+      return NextResponse.json(
+        { message: "Not found" },
+        { status: status.NOT_FOUND },
+      );
+    }
 
-    const totalReceivedCount =
-      totalCountResult.records[0]?.get("receiveTxCount").toNumber();
-    const totalSentCount =
-      totalCountResult.records[0]?.get("sendTxCount").toNumber();
-
+    const totalReceivedCount = totalCountResult.records[0]
+      ?.get("receiveTxCount")
+      .toNumber();
+    const totalSentCount = totalCountResult.records[0]
+      ?.get("sendTxCount")
+      .toNumber();
     const topReceived = topReceivedResult.records.map((record) => {
       const count = record.get("count").toNumber();
       return {
@@ -149,11 +169,16 @@ async function getTopInteractions(
         { headers },
       ),
     ]);
-  let totalReceivedCount =
-    totalCountResponse.data.data.ethereum.addressStats[0].address
-      .receiveTxCount;
-  let totalSentCount =
-    totalCountResponse.data.data.ethereum.addressStats[0].address.sendTxCount;
+  const totalCountData = totalCountResponse.data.data.ethereum.addressStats;
+  if (totalCountData.length === 0) {
+    return NextResponse.json(
+      { message: "Not found" },
+      { status: status.NOT_FOUND },
+    );
+  }
+
+  let totalReceivedCount = totalCountData[0].address.receiveTxCount;
+  let totalSentCount = totalCountData[0].address.sendTxCount;
   // Disclaimer: The BitQuery API may not always provide up-to-date statistics on the total number of transactions sent and received
   // Ensure the totals are greater than or equal to the sum of the top 10 results
   totalReceivedCount = Math.max(

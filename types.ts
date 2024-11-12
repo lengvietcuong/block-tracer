@@ -37,28 +37,3 @@ export type BlockchainSymbol =
   | "matic"
   | "klay"
   | "swc";
-
-// Represents a single interaction with an address
-export interface Interaction {
-  address: string;
-  count: number;
-  percentage: number;
-}
-
-// Represents the top interactions for received and sent transactions
-export interface TopInteractions {
-  topReceived: Interaction[];
-  topSent: Interaction[];
-}
-
-// Represents a single monthly transaction count
-export interface MonthlyCount {
-  count: number;
-  date: Date;
-}
-
-// Represents the monthly transaction counts for received and sent transactions
-export interface MonthlyTransactionCount {
-  received: MonthlyCount[];
-  sent: MonthlyCount[];
-}

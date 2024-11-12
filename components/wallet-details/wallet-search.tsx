@@ -8,17 +8,20 @@ import { useRouter } from "next/navigation";
 import { IoSearch as SearchIcon } from "react-icons/io5";
 import { ImSpinner10 as LoadingSpinner } from "react-icons/im";
 import BlockSearch from "@/components/icons/block-search";
+import { cn } from "@/lib/utils";
 
 interface WalletSearchProps {
   defaultBlockchain?: BlockchainSymbol;
   variant?: "full" | "compact";
   showLoading?: boolean;
+  className?: string;
 }
 
 export default function WalletSearch({
   defaultBlockchain = "eth",
   variant = "full",
   showLoading = false,
+  className,
 }: WalletSearchProps) {
   const [walletAddress, setWalletAddress] = useState("");
   const [blockchainSymbol, setBlockchainSymbol] =
@@ -29,9 +32,9 @@ export default function WalletSearch({
   function handleWalletSearch(event: FormEvent | MouseEvent) {
     event.preventDefault(); // Prevent a full page reload
     if (walletAddress.trim()) {
-      setLoading(true);
+      setLoading(false);
       // Redirect the user to the appropriate wallet details page
-      router.push(`/${blockchainSymbol}/${walletAddress}`);
+      router.push(`/${blockchainSymbol}/${walletAddress.trim()}`);
     }
   }
 
@@ -50,11 +53,14 @@ export default function WalletSearch({
       )}
       <form
         id="wallet-search"
-        className={`flex items-center rounded-lg ${
-          variant === "full"
-            ? "bg-background shadow-[0_0_10px_3px_hsl(var(--muted-foreground)/0.5)] lg:shadow-[0_0_20px_5px_hsl(var(--muted-foreground)/0.5)]"
-            : "max-w-64 bg-secondary sm:max-w-none"
-        }`}
+        className={cn(
+          `flex items-center rounded-lg ${
+            variant === "full"
+              ? "bg-background shadow-[0_0_10px_3px_hsl(var(--muted-foreground)/0.5)] lg:shadow-[0_0_20px_5px_hsl(var(--muted-foreground)/0.5)]"
+              : "max-w-64 bg-secondary sm:max-w-none"
+          }`,
+          className,
+        )}
         onSubmit={handleWalletSearch}
       >
         <div className="relative flex-1">

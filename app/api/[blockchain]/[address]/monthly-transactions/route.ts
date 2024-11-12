@@ -1,19 +1,32 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { initializeNeo4j, runQuery } from "@/lib/neo4j";
+import status from "http-status";
 import { BlockchainSymbol } from "@/types";
 import { COIN_NAMES, BIT_QUERY_URL } from "@/constants";
+import { isValidAddress, getJsonOfError } from "@/utils";
 
-// Define the API endpoint /[blockchain]/[address]/monthly-transactions
+// Define the API endpoint /api/[blockchain]/[address]/monthly-transactions
 export async function GET(
   _request: Request,
   { params }: { params: { blockchain: BlockchainSymbol; address: string } },
 ) {
   const { blockchain, address } = params;
-  if (blockchain === "swc") {
-    return getSwincoinMonthlyTransactions(address); // Swincoin data from the school's dataset
+  if (!isValidAddress(address, blockchain)) {
+    return NextResponse.json(
+      { message: "Not found" },
+      { status: status.NOT_FOUND },
+    );
   }
-  return getMonthlyTransactions(blockchain, address); // From the actual blockchain
+
+  try {
+    if (blockchain === "swc") {
+      return await getSwincoinMonthlyTransactions(address); // Swincoin data from the school's dataset
+    }
+    return await getMonthlyTransactions(blockchain, address); // From the actual blockchain
+  } catch (error) {
+    return getJsonOfError(error);
+  }
 }
 
 async function getSwincoinMonthlyTransactions(address: string) {
@@ -49,6 +62,15 @@ async function getSwincoinMonthlyTransactions(address: string) {
       runQuery(neo4jDriver, receivedQuery, { address }),
       runQuery(neo4jDriver, sentQuery, { address }),
     ]);
+    if (
+      receivedResult.records.length === 0 &&
+      sentResult.records.length === 0
+    ) {
+      return NextResponse.json(
+        { message: "Not found" },
+        { status: status.NOT_FOUND },
+      );
+    }
     // Format the response with proper date objects and number conversions
     return NextResponse.json({
       received: receivedResult.records.map((record) => ({
@@ -120,7 +142,12 @@ async function getMonthlyTransactions(
   ]);
   const receivedTransactions = receivedResponse.data.data.ethereum.transfers;
   const sentTransactions = sentResponse.data.data.ethereum.transfers;
-
+  if (receivedTransactions.length === 0 && sentTransactions.length === 0) {
+    return NextResponse.json(
+      { message: "Not found" },
+      { status: status.NOT_FOUND },
+    );
+  }
   // Format the response with proper date objects and number conversions
   return NextResponse.json({
     received: receivedTransactions.map((tx) => ({

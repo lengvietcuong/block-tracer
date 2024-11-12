@@ -11,6 +11,7 @@ import { GrDocumentText as TransactionIcon } from "react-icons/gr";
 import { LiaSpinnerSolid as LoadingSpinner } from "react-icons/lia";
 import { TransactionPartial, BlockchainSymbol, Transaction } from "@/types";
 import { format } from "date-fns";
+import { redirectIfFailed } from "@/utils";
 
 interface TransactionDialogProps {
   isOpen: boolean; // Controls whether the dialog is open or closed
@@ -38,6 +39,8 @@ export default function TransactionDialog({
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/${blockchainSymbol}/transaction/${transaction!.hash}`,
         { cache: "no-store" },
       );
+      redirectIfFailed(response);
+      
       const details = await response.json();
       setTransactionDetails(details);
     }

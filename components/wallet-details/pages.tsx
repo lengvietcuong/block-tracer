@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/pagination";
 import { BlockchainSymbol } from "@/types";
 import { TRANSACTIONS_PER_PAGE } from "@/constants";
+import { redirectIfFailed } from "@/utils";
 
 interface PagesProps {
   blockchainSymbol: BlockchainSymbol;
@@ -27,8 +28,9 @@ export default async function Pages({
 }: PagesProps) {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/${blockchainSymbol}/${address}/total-transactions`,
-    { cache: 'no-store' },
+    { cache: "no-store" },
   );
+  redirectIfFailed(response);
   const numTransactions = await response.json();
   const numPages = Math.ceil(numTransactions / TRANSACTIONS_PER_PAGE);
 

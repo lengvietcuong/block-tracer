@@ -1,18 +1,32 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { initializeNeo4j, runQuery } from "@/lib/neo4j";
+import status from "http-status";
 import { BlockchainSymbol } from "@/types";
-import { COIN_NAMES, BIT_QUERY_URL } from "@/constants";
+import { COIN_NAMES, BLOCKCHAIN_NAMES, BIT_QUERY_URL } from "@/constants";
+import { getJsonOfError } from "@/utils";
 
+// Define the API endpoint /api/[blockchain]/transaction/[hash]
 export async function GET(
   _request: Request,
   { params }: { params: { blockchain: BlockchainSymbol; hash: string } },
 ) {
   const { blockchain, hash } = params;
-  if (blockchain === "swc") {
-    return getSwincoinTransactionsDetails(hash);
+  if (!(blockchain in BLOCKCHAIN_NAMES)) {
+    return NextResponse.json(
+      { message: "NOT FOUND" },
+      { status: status.NOT_FOUND },
+    );
   }
-  return getTransactionDetails(blockchain, hash);
+
+  try {
+    if (blockchain === "swc") {
+      return await getSwincoinTransactionsDetails(hash); // Swincoin data from the school's dataset
+    }
+    return await getTransactionDetails(blockchain, hash); // From the actual blockchain
+  } catch (error) {
+    return getJsonOfError(error);
+  }
 }
 
 async function getSwincoinTransactionsDetails(hash: string) {
@@ -21,6 +35,7 @@ async function getSwincoinTransactionsDetails(hash: string) {
       MATCH (tx:Transaction {hash: $hash})
       RETURN
         tx.transaction_index AS index,
+        tx.input AS input,
         tx.gas AS gas,
         tx.gas_used AS gasUsed,
         tx.gas_price AS gasPrice,
@@ -30,13 +45,22 @@ async function getSwincoinTransactionsDetails(hash: string) {
     `;
   try {
     const result = await runQuery(neo4jDriver, query, { hash });
+    if (result.records.length === 0) {
+      return NextResponse.json(
+        { message: "Not found" },
+        { status: status.NOT_FOUND },
+      );
+    }
+    const record = result.records[0];
     return NextResponse.json({
-      transactionIndex: result.records[0].get("index").toNumber(),
-      gasUsed: result.records[0].get("gasUsed").toNumber(),
-      gasPrice: result.records[0].get("gasPrice").toNumber(),
-      transactionFee: result.records[0].get("gasValue").toNumber() / 1e18, // Convert from wei to ether
-      blockNumber: result.records[0].get("blockNumber").toNumber(),
-      blockHash: result.records[0].get("blockHash"),
+      transactionIndex: record.get("index").toNumber(),
+      input: record.get("input"),
+      gas: record.get("gas").toNumber(),
+      gasUsed: record.get("gasUsed").toNumber(),
+      gasPrice: record.get("gasPrice").toNumber(),
+      transactionFee: record.get("gasValue").toNumber() / 1e18, // Convert from wei to ether
+      blockNumber: record.get("blockNumber").toNumber(),
+      blockHash: record.get("blockHash"),
     });
   } finally {
     await neo4jDriver.close();
@@ -74,8 +98,15 @@ async function getTransactionDetails(
     { query },
     { headers },
   );
-  const tx = transaactionResponse.data.data.ethereum.transactions[0];
+  const transactionData = transaactionResponse.data.data.ethereum.transactions;
+  if (transactionData.length === 0) {
+    return NextResponse.json(
+      { message: "Not found" },
+      { status: status.NOT_FOUND },
+    );
+  }
 
+  const tx = transaactionResponse.data.data.ethereum.transactions[0];
   // Second query: Get block hash using block height from first query
   query = `
    {

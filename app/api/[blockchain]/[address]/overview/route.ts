@@ -1,19 +1,32 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
-import {initializeNeo4j, runQuery} from "@/lib/neo4j";
+import { initializeNeo4j, runQuery } from "@/lib/neo4j";
+import status from "http-status";
 import { BlockchainSymbol } from "@/types";
 import { COIN_NAMES, BIT_QUERY_URL } from "@/constants";
+import { isValidAddress, getJsonOfError } from "@/utils";
 
-// Define the API endpoint /[blockchain]/[address]/overview
+// Define the API endpoint /api/[blockchain]/[address]/overview
 export async function GET(
   _request: Request,
   { params }: { params: { blockchain: BlockchainSymbol; address: string } },
 ) {
   const { blockchain, address } = params;
-  if (blockchain === "swc") {
-    return getSwincoinWalletOverview(address);
+  if (!isValidAddress(address, blockchain)) {
+    return NextResponse.json(
+      { message: "Not found" },
+      { status: status.NOT_FOUND },
+    );
   }
-  return getWalletOverview(blockchain, address);
+
+  try {
+    if (blockchain === "swc") {
+      return await getSwincoinWalletOverview(address); // Swincoin data from the school's dataset
+    }
+    return await getWalletOverview(blockchain, address); // From the actual blockchain
+  } catch (error) {
+    return getJsonOfError(error);
+  }
 }
 
 async function getSwincoinWalletOverview(address: string) {
@@ -39,6 +52,12 @@ async function getSwincoinWalletOverview(address: string) {
   `;
   try {
     const result = await runQuery(neo4jDriver, query, { address });
+    if (result.records.length === 0) {
+      return NextResponse.json(
+        { message: "Not found" },
+        { status: status.NOT_FOUND },
+      );
+    }
     const record = result.records[0];
 
     // Parse timestamps as integers
@@ -75,7 +94,6 @@ async function getWalletOverview(
     "Content-Type": "application/json",
     "X-API-KEY": process.env.BIT_QUERY_API_KEY,
   };
-
   const query = `
     {
       ethereum(network: ${COIN_NAMES[blockchain]}) {
@@ -99,8 +117,16 @@ async function getWalletOverview(
     }`;
 
   const response = await axios.post(BIT_QUERY_URL, { query }, { headers });
-  const walletDetails = response.data.data.ethereum.addressStats[0].address;
-  const contractType = response.data.data.ethereum.address[0].smartContract
+  const responseData = response.data.data.ethereum;
+  if (responseData.addressStats.length === 0) {
+    return NextResponse.json(
+      { message: "Not found" },
+      { status: status.NOT_FOUND },
+    );
+  }
+
+  const walletDetails = responseData.addressStats[0].address;
+  const contractType = responseData.address[0].smartContract
     ? response.data.data.ethereum.address[0].smartContract.contractType
     : "eoa";
 
