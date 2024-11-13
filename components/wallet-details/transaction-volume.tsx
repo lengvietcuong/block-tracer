@@ -77,7 +77,7 @@ export function TransactionVolume({
           value={timeFrame}
           onValueChange={(value: TimeFrame) => setTimeFrame(value)}
         >
-          <SelectTrigger className="w-44">
+          <SelectTrigger id="time-period" aria-label="Select time period" className="w-44">
             <SelectValue placeholder="Select time frame" />
           </SelectTrigger>
           <SelectContent>

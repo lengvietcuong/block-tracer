@@ -79,6 +79,7 @@ export default function WalletSearch({
             onChange={(e) => setWalletAddress(e.target.value)}
             placeholder="Enter address"
             className={`border-none bg-transparent pl-12 ${variant === "full" ? "h-12" : "h-10 text-xs"} `}
+            autoComplete="on"
           />
         </div>
         <BlockchainSelection
