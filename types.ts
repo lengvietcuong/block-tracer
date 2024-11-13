@@ -21,6 +21,13 @@ export type TransactionPartial = Pick<
   "hash" | "fromAddress" | "toAddress" | "value" | "blockTimestamp"
 >;
 
+export type Report = {
+  category: string;
+  name: string;
+  description: string;
+  url: string;
+}
+
 // Represents a node in the transaction graph
 export type Node = {
   id: string;

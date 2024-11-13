@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { TriangleAlert, CircleCheckBig } from "lucide-react";
-import { BlockchainSymbol } from "@/types";
+import { BlockchainSymbol, Report } from "@/types";
 import { redirectIfFailed } from "@/utils";
 
 interface WalletReportsProps {
@@ -10,50 +10,12 @@ interface WalletReportsProps {
   address: string;
 }
 
-interface Report {
-  category: string;
-  name: string;
-  description: string;
-  url: string;
-}
-
-// Function to process and categorize reports by unique URL and category
-function processReports(reports: Report[]): Record<string, Report[]> {
-  // Remove duplicate reports based on unique URLs
-  const uniqueReports = reports.reduce(
-    (acc: Record<string, Report>, report: Report) => {
-      if (!acc[report.url]) {
-        acc[report.url] = report;
-      }
-      return acc;
-    },
-    {},
-  );
-
-  // Group unique reports by category
-  return Object.values(uniqueReports).reduce(
-    (acc: Record<string, Report[]>, report: Report) => {
-      if (!acc[report.category]) {
-        acc[report.category] = [];
-      }
-      acc[report.category].push(report);
-      return acc;
-    },
-    {},
-  );
-}
-
 // Function to remove the URL from the description and limit to 100 words
-function cleanDescription(description: string, url: string): string {
-  // First remove the URL if it appears at the end
-  const descWithoutUrl = description.endsWith(url)
-    ? description.slice(0, -url.length).trim()
-    : description;
-
+function shortenDescription(description: string): string {
   // Split into words and limit to 100
-  const words = descWithoutUrl.split(/\s+/);
+  const words = description.split(/\s+/);
   if (words.length <= 100) {
-    return descWithoutUrl;
+    return description;
   }
 
   // Join first 100 words and add ellipsis
@@ -70,9 +32,8 @@ export default async function WalletReports({
     { cache: "no-store" },
   );
   redirectIfFailed(response);
-  const fetchedReports = await response.json();
-  const reports = processReports(fetchedReports.identifications);
-  const totalReports = Object.values(reports).flat().length;
+  const reports = await response.json();
+  const totalReports = reports.length;
 
   // Display alert if no reports are found
   if (totalReports === 0) {
@@ -117,38 +78,36 @@ export default async function WalletReports({
           and may not be complete.
         </AlertDescription>
       </Alert>
-      {Object.entries(reports).map(([category, categoryReports]) => (
-        <Card key={category} className="mt-4 bg-transparent">
-          <CardHeader>
-            <CardTitle className="capitalize">{category}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {categoryReports.map((report, index) => (
-              <div key={index} className="mb-4 last:mb-0">
-                <h3 className="mb-2 break-all text-lg font-semibold">
-                  {report.name}
-                </h3>
-                <p className="mb-4 text-sm text-muted-foreground">
-                  {cleanDescription(report.description, report.url)}
-                </p>
-                {report.url && (
-                  <div className="flex items-center space-x-2">
-                    <Badge variant="secondary">More Info</Badge>
-                    <a
-                      href={report.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="break-all text-sm italic text-muted-foreground transition-colors duration-100 hover:text-foreground"
-                    >
-                      {report.url}
-                    </a>
-                  </div>
-                )}
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      ))}
+      <Card className="mt-4 bg-transparent">
+        <CardHeader>
+          <CardTitle>Reports</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {(reports as Report[]).map((report, index) => (
+            <div key={index} className="mb-4 last:mb-0">
+              <h3 className="mb-2 break-all text-lg font-semibold">
+                {report.name}
+              </h3>
+              <p className="mb-4 text-sm text-muted-foreground">
+                {shortenDescription(report.description)}
+              </p>
+              {report.url && (
+                <div className="flex items-center space-x-2">
+                  <Badge variant="secondary">More Info</Badge>
+                  <a
+                    href={report.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="break-all text-sm italic text-muted-foreground transition-colors duration-100 hover:text-foreground"
+                  >
+                    {report.url}
+                  </a>
+                </div>
+              )}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </>
   );
 }
