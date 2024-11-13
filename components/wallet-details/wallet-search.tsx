@@ -32,7 +32,7 @@ export default function WalletSearch({
   function handleWalletSearch(event: FormEvent | MouseEvent) {
     event.preventDefault(); // Prevent a full page reload
     if (walletAddress.trim()) {
-      setLoading(false);
+      setLoading(true);
       // Redirect the user to the appropriate wallet details page
       router.push(`/${blockchainSymbol}/${walletAddress.trim()}`);
     }
