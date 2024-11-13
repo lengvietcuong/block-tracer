@@ -14,11 +14,11 @@ export default function ThreatSection() {
         <a
           href="https://www.ic3.gov/Media/PDF/AnnualReport/2023_IC3CryptocurrencyReport.pdf"
           target="_blank"
-          className="peer underline-offset-4 transition-colors hover:text-foreground hover:underline"
+          className="peer underline-offset-4 transition-colors duration-100 hover:text-foreground hover:underline"
         >
           FBI
         </a>
-        <UpRightArrowIcon className="peer ml-1 inline-block transition-colors peer-hover:fill-foreground" />
+        <UpRightArrowIcon className="peer ml-0.5 inline-block transition-colors duration-100 peer-hover:fill-foreground" />
       </p>
       <div className="mt-6 flex flex-col gap-8 md:mt-9 md:gap-10 lg:mt-12 lg:flex-row lg:gap-20">
         <div className="w-full flex-shrink-0 lg:w-1/2">

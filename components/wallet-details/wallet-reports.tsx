@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { TriangleAlert, CircleCheckBig } from "lucide-react";
+import { PiArrowUpRightBold as UpRightArrowIcon } from "react-icons/pi";
 import { BlockchainSymbol, Report } from "@/types";
 import { redirectIfFailed } from "@/utils";
 
@@ -47,10 +48,11 @@ export default async function WalletReports({
             href="https://www.chainanalysis.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="italic hover:text-foreground"
+            className="peer underline-offset-4 transition-colors duration-100 hover:text-foreground hover:underline"
           >
             chainanalysis.com
-          </a>{" "}
+          </a>
+          <UpRightArrowIcon className="ml-0.5 peer inline-block transition-colors duration-100 peer-hover:fill-foreground" />{" "}
           and may not be complete.
         </AlertDescription>
       </Alert>
@@ -71,10 +73,11 @@ export default async function WalletReports({
             href="https://www.chainanalysis.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="italic transition-colors duration-100 hover:text-foreground"
+            className="peer underline-offset-4 transition-colors duration-100 hover:text-foreground hover:underline"
           >
             chainanalysis.com
-          </a>{" "}
+          </a>
+          <UpRightArrowIcon className="ml-0.5 peer inline-block transition-colors duration-100 peer-hover:fill-foreground" />{" "}
           and may not be complete.
         </AlertDescription>
       </Alert>
