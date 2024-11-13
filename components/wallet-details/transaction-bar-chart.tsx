@@ -45,8 +45,8 @@ export default function TransactionBarChart({
           tickLine={false}
           axisLine={false}
           tickMargin={8}
-          tickFormatter={(value: string) =>
-            new Date(value).toLocaleString("default", { month: "short" })
+          tickFormatter={(monthYear: string) =>
+            new Date(`${monthYear}-01`).toLocaleString("default", { month: "short" })
           }
         />
         <YAxis
