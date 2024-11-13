@@ -18,11 +18,11 @@ export async function GET(
     );
   }
 
-  // Connect with Chain Analysis and fetch reports
+  // Connect with Chainalysis and fetch reports
   try {
     const headers = {
       "Content-Type": "application/json",
-      "X-API-KEY": process.env.CHAIN_ANALYSIS_API_KEY,
+      "X-API-KEY": process.env.CHAINALYSIS_API_KEY,
     };
     const response = await axios.get(`${CHAIN_ANALYSIS_URL}/${address}`, {
       headers,

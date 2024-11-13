@@ -45,14 +45,14 @@ export default async function WalletReports({
         <AlertDescription className="mt-2 text-xs text-muted-foreground">
           Note: Reports are from{" "}
           <a
-            href="https://www.chainanalysis.com"
+            href="https://www.chainalysis.com"
             target="_blank"
             rel="noopener noreferrer"
             className="peer underline-offset-4 transition-colors duration-100 hover:text-foreground hover:underline"
           >
-            chainanalysis.com
+            chainalysis.com
           </a>
-          <UpRightArrowIcon className="ml-0.5 peer inline-block transition-colors duration-100 peer-hover:fill-foreground" />{" "}
+          <UpRightArrowIcon className="peer ml-0.5 inline-block transition-colors duration-100 peer-hover:fill-foreground" />{" "}
           and may not be complete.
         </AlertDescription>
       </Alert>
@@ -70,14 +70,14 @@ export default async function WalletReports({
         <AlertDescription className="mt-2 text-xs text-muted-foreground">
           Note: Reports are pulled from{" "}
           <a
-            href="https://www.chainanalysis.com"
+            href="https://www.chainalysis.com"
             target="_blank"
             rel="noopener noreferrer"
             className="peer underline-offset-4 transition-colors duration-100 hover:text-foreground hover:underline"
           >
-            chainanalysis.com
+            chainalysis.com
           </a>
-          <UpRightArrowIcon className="ml-0.5 peer inline-block transition-colors duration-100 peer-hover:fill-foreground" />{" "}
+          <UpRightArrowIcon className="peer ml-0.5 inline-block transition-colors duration-100 peer-hover:fill-foreground" />{" "}
           and may not be complete.
         </AlertDescription>
       </Alert>
