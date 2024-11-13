@@ -22,10 +22,14 @@ export const config = {
 
 export default async function middleware(request: NextRequest) {
   const ip = request.ip ?? "127.0.0.1";
+  // Do not apply rate limiting for localhost
+  if (ip === "127.0.0.1" || ip === "::1") {
+    return NextResponse.next();
+  }
+
   const { success, limit, reset, remaining } = await ratelimit.limit(
     `ratelimit_${ip}`,
   );
-
   if (!success) {
     return NextResponse.json(
       { error: "Too Many Requests" },
