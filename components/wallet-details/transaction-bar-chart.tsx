@@ -12,8 +12,8 @@ import {
 
 interface TransactionBarChartProps {
   chartData: {
-    received: { count: number; date: Date }[];
-    sent: { count: number; date: Date }[];
+    received: { count: number; date: string }[];
+    sent: { count: number; date: string }[];
   };
   config: ChartConfig;
   className?: string;
@@ -45,8 +45,10 @@ export default function TransactionBarChart({
           tickLine={false}
           axisLine={false}
           tickMargin={8}
-          tickFormatter={(monthYear: string) =>
-            new Date(`${monthYear}-01`).toLocaleString("default", { month: "short" })
+          tickFormatter={(yearMonth: string) =>
+            new Date(yearMonth).toLocaleString("default", {
+              month: "short",
+            })
           }
         />
         <YAxis
@@ -69,18 +71,21 @@ function processTransactions(
     string,
     { month: string; received: number; sent: number }
   >,
-  transactions: { count: number; date: Date }[],
+  transactions: { count: number; date: string }[],
   isIncoming: boolean,
 ) {
   transactions.forEach(({ count, date }) => {
-    const monthYear = date.toISOString().slice(0, 7);
-    if (!monthlyData[monthYear]) {
-      monthlyData[monthYear] = { month: monthYear, received: 0, sent: 0 };
+    const dateObj = new Date(date);
+    const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0'); // Zero-pad month
+    const year = dateObj.getUTCFullYear();
+    const yearMonth = `${year}-${month}`;
+    if (!monthlyData[yearMonth]) {
+      monthlyData[yearMonth] = { month: yearMonth, received: 0, sent: 0 };
     }
     if (isIncoming) {
-      monthlyData[monthYear].received += count;
+      monthlyData[yearMonth].received += count;
     } else {
-      monthlyData[monthYear].sent += count;
+      monthlyData[yearMonth].sent += count;
     }
   });
 }

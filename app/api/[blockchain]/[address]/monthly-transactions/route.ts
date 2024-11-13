@@ -76,14 +76,14 @@ async function getSwincoinMonthlyTransactions(address: string) {
       received: receivedResult.records.map((record) => ({
         date: new Date(
           record.get("year").toNumber(),
-          record.get("month").toNumber(),
+          record.get("month").toNumber() - 1,
         ),
         count: record.get("count").toNumber(),
       })),
       sent: sentResult.records.map((record) => ({
         date: new Date(
           record.get("year").toNumber(),
-          record.get("month").toNumber(),
+          record.get("month").toNumber() - 1,
         ),
         count: record.get("count").toNumber(),
       })),
@@ -152,11 +152,11 @@ async function getMonthlyTransactions(
   return NextResponse.json({
     received: receivedTransactions.map((tx) => ({
       count: Number(tx.count),
-      date: new Date(tx.date.year, tx.date.month),
+      date: new Date(tx.date.year, tx.date.month - 1),
     })),
     sent: sentTransactions.map((tx) => ({
       count: Number(tx.count),
-      date: new Date(tx.date.year, tx.date.month),
+      date: new Date(tx.date.year, tx.date.month - 1),
     })),
   });
 }

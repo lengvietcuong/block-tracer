@@ -9,8 +9,8 @@ const TransactionBarChart = dynamic(
 );
 
 interface AggregateTransactionData {
-  received: { count: number; date: Date }[];
-  sent: { count: number; date: Date }[];
+  received: { count: number; date: string }[];
+  sent: { count: number; date: string }[];
 }
 
 interface TransactionsCountProps {
@@ -29,10 +29,6 @@ export default async function TransactionsCount({
   );
   redirectIfFailed(response);
   const data: AggregateTransactionData = await response.json();
-  // Convert the date strings to Date objects
-  data.received.forEach((item) => (item.date = new Date(item.date)));
-  data.sent.forEach((item) => (item.date = new Date(item.date)));
-
   // Define visual configuration for the two data series (sent and received transactions)
   const chartConfig = {
     received: {
