@@ -15,36 +15,37 @@ export async function GET(
   // Extract parameters from the request URL
   const { blockchain, address } = params;
   const searchParams = request.nextUrl.searchParams;
-  const sort = searchParams.get("sort") || "time";
-  const page = Number(searchParams.get("page")) || 1;
+  const limit = Number(searchParams.get("limit")) || TRANSACTIONS_PER_PAGE;
+  const offset = Number(searchParams.get("offset")) || 0;
+  const orderBy = searchParams.get("orderBy") || "time";
   // Verify that the parameters are valid
   if (
     !isValidAddress(address, blockchain) ||
-    (sort !== "time" && sort !== "amount") ||
-    page < 1
+    isNaN(limit) ||
+    isNaN(offset) ||
+    (orderBy !== "time" && orderBy !== "amount")
   ) {
     return NextResponse.json(
       { message: "Not found" },
       { status: status.NOT_FOUND },
     );
   }
-  const offset = (page - 1) * TRANSACTIONS_PER_PAGE;
 
   try {
     if (blockchain === "swc") {
       return await getSwincoinTransactions(
         address,
-        TRANSACTIONS_PER_PAGE,
+        limit,
         offset,
-        sort,
+        orderBy,
       ); // Swincoin data from the school's dataset
     }
     return await getTransactions(
       blockchain,
       address,
-      TRANSACTIONS_PER_PAGE,
+      limit,
       offset,
-      sort,
+      orderBy,
     ); // From the actual blockchain
   } catch (error) {
     return getJsonOfError(error);
