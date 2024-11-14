@@ -17,7 +17,7 @@ const ratelimit = new Ratelimit({
 
 // Define which routes to protect with the rate limiter
 export const config = {
-  matcher: ["/api/:path*"],
+  matcher: "/api/:path*",
 };
 
 export default async function middleware(request: NextRequest) {
