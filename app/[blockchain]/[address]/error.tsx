@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, Mail } from "lucide-react";
@@ -14,20 +13,9 @@ const NEXTJS_HIDDEN_ERROR_MESSAGE =
 
 export default function Component({
   error,
-  reset,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
 }) {
-  const [isLoading, setIsLoading] = useState(false);
-
-  async function handleReset() {
-    setIsLoading(true);
-    // Add a delay of 0.5s to show the loading spinner before reloading
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    reset();
-  }
-
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background p-4 text-center">
       <SadFaceIcon className="mb-4 h-20 w-20 text-muted-foreground" />
@@ -42,13 +30,10 @@ export default function Component({
       <Button
         variant="secondary"
         className="mb-4"
-        onClick={handleReset}
-        disabled={isLoading}
+        onClick={() => window.location.reload()}
       >
-        <RotateCcw
-          className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
-        />
-        {isLoading ? "Trying..." : "Try again"}
+        <RotateCcw className="mr-2 h-4 w-4" />
+        Try again
       </Button>
       <p className="max-w-screen-sm text-muted-foreground">
         An unexpected error occurred while fetching the data you&apos;re looking
