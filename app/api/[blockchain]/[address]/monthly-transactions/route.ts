@@ -33,7 +33,7 @@ async function getSwincoinMonthlyTransactions(address: string) {
   // Connect to Neo4j
   const neo4jDriver = initializeNeo4j();
 
-  // Cypher queries to fetch received transactions
+  // Cypher query to fetch received transactions
   const receivedQuery = `
   MATCH (addr:Address {address: $address})<-[:RECEIVED_BY]-(tx:Transaction)
   WHERE tx.block_timestamp IS NOT NULL
