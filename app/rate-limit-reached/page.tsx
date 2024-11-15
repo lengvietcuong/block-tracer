@@ -3,7 +3,7 @@ import { FaRegSadTear as SadFaceIcon } from "react-icons/fa";
 import { IoMdArrowRoundBack as ArrowLeftIcon } from "react-icons/io";
 import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-//a
+
 export default function Page() {
   return (
     <main className="grid h-screen w-screen place-items-center">
