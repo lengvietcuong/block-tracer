@@ -16,7 +16,7 @@ export default function Page({
   // Extract parameters from the URL
   // The URL is in the format /[blockchain]/[address]?sort=<sort>&page=<page>
   const blockchainSymbol = params.blockchain as BlockchainSymbol;
-  const address = params.address;
+  const address = params.address.toLowerCase();
   const sort = searchParams.sort || "time";
   const page = Number(searchParams.page) || 1;
 
